@@ -1,6 +1,6 @@
 # ==== CONFIGURE =====
 # Use a Node 16 base image
-FROM node:20-alpine 
+FROM node:20-alpine as builder
 # Set the working directory to /app inside the container
 WORKDIR /app
 # Copy app files
@@ -15,14 +15,15 @@ FROM node:slim
 # ==== RUN =======
 # Set the env to "production"
 ENV NODE_ENV production
-USER node
-# Create app directory
-WORKDIR /app
 
-# Install app dependencies
-COPY package*.json ./
+# Create app directory
+WORKDIR /app/build
+COPY --from=builder /app/build .
+
+WORKDIR /app
+COPY --from=builder /app/package*.json .
 
 # Expose the port on which the app will be running (3000 is the default that `serve` uses)
 EXPOSE 3000
 # Start the app
-CMD [ "npx", "serve", "build" ]
+CMD [ "npx", "serve", "-s", "build" ]
