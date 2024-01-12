@@ -5,8 +5,9 @@
   "main": "dist/src/app.js",
   "scripts": {
     "dev": "nodemon",
-    "start": "npx prisma generate && tsc && node dist/src/app.js",
-    "build": "npx prisma generate && tsc",
+    "init": "npx prisma generate",
+    "start": "tsc && node dist/src/app.js",
+    "build": "tsc",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
