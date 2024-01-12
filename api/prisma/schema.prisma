@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum RoomStatus {
+    OPEN
+    CLOSED
+}
+
+enum Mode {
+    SINGLE_PLAYER
+    MULTIPLAYER
+}
+
+enum PrivacyLevel {
+    PUBLIC
+    PRIVATE
+}
+
+enum MatchStatus {
+    READY
+    STARTED
+    FINISHED
+}
+
+enum Color {
+    BLACK
+    WHITE
+}
+
+model Room {
+    id                  String          @id @default(uuid()) @map("_id")
+    status              RoomStatus
+    mode                Mode            @default(SINGLE_PLAYER)
+    chat_mode           PrivacyLevel    @default(PUBLIC)
+    visibility          PrivacyLevel    @default(PUBLIC)
+    room_url            String
+    player_one          String
+    player_two          String
+    player_one_score    Float
+    player_two_score    Float
+    viewers             Int
+    created_at          DateTime        @default(now())
+    match               Match[]
+}
+
+model Match {
+    id                  String          @id @default(uuid()) @map("_id")
+    room_id             String
+    status              MatchStatus
+    black_name          String
+    white_name          String
+    winner              Color
+    start_timestamp     DateTime
+    end_timestamp       DateTime
+    created_at          DateTime        @default(now())
+    board               Board?
+    room                Room            @relation(fields: [room_id], references: [id])
+}
+
+model Board {
+    id                  String          @id @default(uuid()) @map("_id")
+    match_id            String          @unique
+    state               String
+    created_at          DateTime        @default(now())
+    move                Move[]
+    match               Match           @relation(fields: [match_id], references: [id])
+}
+
+model Move {
+    id                  String          @id @default(uuid()) @map("_id")
+    board_id            String
+    color               Color
+    movement            String
+    created_at          DateTime        @default(now())
+    board               Board           @relation(fields: [board_id], references: [id])
+}
