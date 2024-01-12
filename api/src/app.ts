@@ -1,5 +1,5 @@
 // api/app.ts
-import express from "express";
+import express, {Request, Response, NextFunction} from "express";
 
 const app = express();
 const room_routes = require('./routes/roomRoutes.js')
@@ -12,6 +12,11 @@ app.use('/api/room', room_routes)
 app.use('/api/match', match_routes)
 app.use('/api/board', board_routes)
 app.use('/api/move', move_routes)
+
+// Catch unregistered routes
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({ error: `Route ${req.originalUrl} not found` });
+});
 
 const PORT = process.env.PORT || 3000
 
