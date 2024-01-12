@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
+    "dev": "nodemon",
     "start": "npx prisma generate && tsc && node dist/app.js",
     "build": "npx prisma generate && tsc",
     "lint": "eslint . --ext .ts",
@@ -22,7 +23,9 @@
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
     "eslint": "^8.56.0",
+    "nodemon": "^3.0.2",
     "prisma": "^5.8.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }
