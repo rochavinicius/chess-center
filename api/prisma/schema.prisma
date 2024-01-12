@@ -38,6 +38,7 @@ enum Color {
 
 model Room {
     id               String       @id @default(uuid()) @map("_id")
+    name             String
     status           RoomStatus
     mode             Mode         @default(SINGLE_PLAYER)
     chat_mode        PrivacyLevel @default(PUBLIC)
