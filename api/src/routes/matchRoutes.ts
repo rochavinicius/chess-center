@@ -1,3 +1,5 @@
+import router from "./router"
+
 const {
     getMatches,
     getMatchesById,

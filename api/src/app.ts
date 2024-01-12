@@ -15,6 +15,7 @@ app.use('/api/move', move_routes)
 
 // Catch unregistered routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
+  //var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   res.status(404).json({ error: `Route ${req.originalUrl} not found` });
 });
 

@@ -2,9 +2,9 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
   "scripts": {
-    "start": "npx prisma generate && tsc && node dist/app.js",
+    "start": "npx prisma generate && tsc && node dist/src/app.js",
     "build": "npx prisma generate && tsc",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
