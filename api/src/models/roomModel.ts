@@ -1,15 +1,15 @@
 import { RoomStatus, Mode, PrivacyLevel } from "./enums"
 
 export interface RoomModel {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
     status: RoomStatus,
     mode: Mode,
     chatMode: PrivacyLevel,
     visibility: PrivacyLevel,
-    roomUrl: String,
-    playerOne: String,
-    playerTwo: String,
+    roomUrl: string,
+    playerOne: string,
+    playerTwo: string,
     playerOneScore: Number, 
     playerTwoScore: Number, 
     viewers: Number, 
