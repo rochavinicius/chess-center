@@ -59,9 +59,9 @@ model Match {
     status          MatchStatus
     black_name      String
     white_name      String
-    winner          Color
-    start_timestamp DateTime
-    end_timestamp   DateTime
+    winner          Color?
+    start_timestamp DateTime?
+    end_timestamp   DateTime?
     created_at      DateTime    @default(now())
     board           Board?
     room            Room        @relation(fields: [room_id], references: [id])
