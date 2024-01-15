@@ -1,7 +1,7 @@
 import { MatchStatus } from "./enums";
 
 export interface MatchModel {
-    id: String,
+    id: string,
     roomId: string,
     status: MatchStatus,
     whiteName: string,

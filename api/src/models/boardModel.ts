@@ -1,6 +1,6 @@
 export interface BoardModel {
-    id: String,
-    matchId: String,
+    id: string,
+    matchId: string,
     state: string,
     createdAt: Date,
 }

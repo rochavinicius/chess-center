@@ -1,8 +1,8 @@
 import { Color } from "./enums";
 
 export interface MoveModel {
-    id: String,
-    boardId: String,
+    id: string,
+    boardId: string,
     color: Color,
     movement: string,
     createdAt: Date,
