@@ -1,21 +1,18 @@
-import { Request } from "express";
-import { RoomModel } from "../models/roomModel";
-import { isBlank, ReturnObj } from "../util/utils";
-// import { Mode, PrivacyLevel, RoomStatus } from "../models/enums";
-import prisma from "../../prisma/prisma";
-import { Mode, Prisma, PrivacyLevel, RoomStatus } from "@prisma/client";
+import { Mode, PrivacyLevel, RoomStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
+import { Request } from "express";
+import prisma from "../../prisma/prisma";
+import { RoomModel } from "../models/roomModel";
+import { ReturnObj, isBlank } from "../util/utils";
 
 const addRoom = async (newRoom: RoomModel, req: Request) => {
     let returnObj: ReturnObj = {
-        code: 400,
         message: "Room not created",
         status: false,
     };
 
     if (isBlank(newRoom.name)) {
         returnObj.message = "Invalid Name";
-        console.log('invalid name');
         return returnObj;
     }
 
@@ -46,6 +43,11 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
 
     if (isBlank(newRoom.playerTwo)) {
         returnObj.message = "Invalid Player Two";
+        return returnObj;
+    }
+
+    if (newRoom.playerOne === newRoom.playerTwo) {
+        returnObj.message = "Cannot play against youserlf";
         return returnObj;
     }
 
@@ -82,7 +84,6 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
         newRoom.createdAt = room.created_at;
 
         returnObj = {
-            code: 201,
             message: "Room created",
             obj: newRoom,
             status: true,

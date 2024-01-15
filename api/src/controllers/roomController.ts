@@ -1,9 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { RoomModel } from "../models/roomModel";
-import { MatchModel } from "../models/matchModel";
-// import { MatchStatus } from "../models/enums";
-import { MatchStatus } from "@prisma/client";
-import { ReturnObj, isBlank } from "../util/utils";
+import { ReturnObj } from "../util/utils";
 
 const asyncHandler = require("express-async-handler");
 const roomService = require("../services/roomService");
@@ -24,21 +21,11 @@ exports.getRoomById = asyncHandler(
 exports.createRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            //res.send(JSON.parse(req.body));
             let room: RoomModel = req.body;
+            let returnObj: ReturnObj = await roomService.addRoom(room, req);
 
-            let returnObj: ReturnObj = roomService.addRoom(room, req);
-
-            if (!returnObj.status) {
-                console.log('status false: '+returnObj.message);
-                res.statusCode = returnObj.code;
-                res.json(returnObj);
-                next();
-                return;
-            }
-
-            if (!returnObj.obj) {
-                res.statusCode = returnObj.code;
+            if (!returnObj.status || !returnObj.obj) {
+                res.statusCode = 400;
                 res.json(returnObj);
                 return;
             }
@@ -57,9 +44,14 @@ exports.createRoom = asyncHandler(
             // room.matches = [match];
 
             res.statusCode = 201;
-            res.json(room);
+            res.json(createdRoom);
         } catch (e) {
-            return new Error("error");
+            res.statusCode = 500;
+            let response = {
+                "message": "Unexpected error occurred."
+            }
+            res.json(response);
+            console.error(e);
         }
     }
 );
