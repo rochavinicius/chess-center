@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import { RoomModel } from "../models/roomModel";
 
 const asyncHandler = require("express-async-handler");
+//const roomModel = require("../models/roomModel");
 
 exports.getRooms = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +18,14 @@ exports.getRoomById = asyncHandler(
 
 exports.createRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`);
+        try {
+            let room: RoomModel = req.body;
+
+            
+
+        } catch (e) {
+
+        }
     }
 );
 
