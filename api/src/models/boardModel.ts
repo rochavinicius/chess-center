@@ -1,6 +1,6 @@
-export interface RoomModel {
-    id: String,
-    matchId: String,
+export interface BoardModel {
+    id: string,
+    matchId: string,
     state: string,
     createdAt: Date,
 }
