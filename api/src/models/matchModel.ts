@@ -1,6 +1,6 @@
 import { MatchStatus } from "./enums";
 
-export interface RoomModel {
+export interface MatchModel {
     id: String,
     roomId: string,
     status: MatchStatus,

@@ -1,6 +1,6 @@
 import { Color } from "./enums";
 
-export interface RoomModel {
+export interface MoveModel {
     id: String,
     boardId: String,
     color: Color,
