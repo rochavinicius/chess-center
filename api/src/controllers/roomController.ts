@@ -4,13 +4,19 @@ import { MatchStatus } from "@prisma/client";
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
-import { RoomCommand } from "../models/roomCommands";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
 const matchService = require("../services/matchService");
 const roomService = require("../services/roomService");
 
+/**
+ * Funtion to get a list of rooms
+ *
+ * @param req, res, next
+ * @returns json
+ *
+ */
 exports.getRooms = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {

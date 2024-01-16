@@ -83,3 +83,31 @@ exports.createMatch = asyncHandler(
         }
     }
 );
+
+exports.commandMatch = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            let result = await matchService.commandMatch(
+                req.params.matchId,
+                req.body["command"],
+                req.body["user"]
+            );
+
+            if (!result.success || !result.obj) {
+                res.statusCode = 400;
+                res.json(result);
+                return;
+            }
+
+            res.statusCode = 200;
+            res.send();
+        } catch (e) {
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
+        }
+    }
+);

@@ -12,6 +12,12 @@ import { RoomModel } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
 import { RoomCommand } from "../models/roomCommands";
 
+/**
+ * Function that returns a list of rooms
+ *
+ * @returns ReturnObj
+ *
+ */
 const getRooms = async () => {
     let returnObj: ReturnObj = {
         message: "Rooms not found",
@@ -36,9 +42,11 @@ const getRooms = async () => {
         return returnObj;
     }
 
-    returnObj.message = "Rooms found";
-    returnObj.obj = roomList;
-    returnObj.success = true;
+    returnObj = {
+        message: "Rooms found",
+        obj: roomList,
+        success: true,
+    };
 
     return returnObj;
 };
@@ -70,9 +78,11 @@ const getRoomById = async (roomId: string) => {
         return returnObj;
     }
 
-    returnObj.message = "Room found";
-    returnObj.obj = room;
-    returnObj.success = true;
+    returnObj = {
+        message: "Room found",
+        obj: room,
+        success: true,
+    };
 
     return returnObj;
 };
@@ -215,9 +225,12 @@ const editRoom = async (roomId: string, roomData: RoomModel) => {
         return returnObj;
     }
 
-    returnObj.message = "Room edited with success";
-    returnObj.success = true;
-    returnObj.obj = roomResult;
+    returnObj = {
+        message: "Room edited with success",
+        obj: roomResult,
+        success: true,
+    };
+
     return returnObj;
 };
 
@@ -295,8 +308,11 @@ const commandRoom = async (roomId: string, roomCommand: string) => {
                 }
             }
 
-            returnObj.message = "Success";
-            returnObj.success = true;
+            returnObj = {
+                message: "Success",
+                success: true,
+            };
+
             return returnObj;
         default:
             console.log("default");
