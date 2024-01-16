@@ -9,6 +9,7 @@ export interface RoomModel {
     chatMode: PrivacyLevel;
     visibility: PrivacyLevel;
     roomUrl: string;
+    createdBy: string;
     playerOne: string;
     playerTwo: string;
     playerOneScore: Number;

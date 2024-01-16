@@ -9,8 +9,6 @@ const addBoard = async (newBoard: BoardModel) => {
         status: false,
     };
 
-    console.log(newBoard);
-
     let match = await prisma.match.findUnique({
         where: {
             id: newBoard.matchId,

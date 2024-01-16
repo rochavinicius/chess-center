@@ -123,7 +123,16 @@ exports.createRoom = asyncHandler(
 exports.editRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            
+            let roomResult = await roomService.editRoom(req.params.roomId, req.body);
+
+            if (!roomResult.status || !roomResult.obj) {
+                res.statusCode = 400;
+                res.json(roomResult);
+                return;
+            }
+
+            res.statusCode = 200;
+            res.json(roomResult.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {

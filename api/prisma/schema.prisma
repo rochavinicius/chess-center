@@ -44,6 +44,7 @@ model Room {
     chat_mode        PrivacyLevel @default(PUBLIC)
     visibility       PrivacyLevel @default(PUBLIC)
     room_url         String
+    created_by       String
     player_one       String
     player_two       String
     player_one_score Float

@@ -36,7 +36,7 @@ const getRooms = async () => {
     return returnObj;
 };
 
-const getRoomById =async (roomId: string) => {
+const getRoomById = async (roomId: string) => {
     let returnObj: ReturnObj = {
         message: "Room not found",
         status: false,
@@ -68,7 +68,7 @@ const getRoomById =async (roomId: string) => {
     returnObj.status = true;
 
     return returnObj;
-}
+};
 
 const addRoom = async (newRoom: RoomModel, req: Request) => {
     let returnObj: ReturnObj = {
@@ -132,6 +132,7 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
                 req.originalUrl +
                 "/" +
                 roomId,
+            created_by: newRoom.playerOne,
             player_one: newRoom.playerOne,
             player_two: newRoom.playerTwo,
             player_one_score: 0,
@@ -143,6 +144,7 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
     if (room) {
         newRoom.id = room.id;
         newRoom.roomUrl = room.room_url;
+        newRoom.createdBy = room.created_by;
         newRoom.playerOneScore = room.player_one_score;
         newRoom.playerTwoScore = room.player_two_score;
         newRoom.viewers = room.viewers;
@@ -160,4 +162,56 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
     return returnObj;
 };
 
-module.exports = { getRooms, getRoomById, addRoom };
+const editRoom = async (roomId: string, roomData: RoomModel) => {
+    let returnObj: ReturnObj = {
+        message: "Room not found",
+        status: false,
+    };
+
+    let room = await prisma.room.findUnique({
+        include: {
+            match: {
+                include: {
+                    board: {
+                        include: {
+                            move: true,
+                        },
+                    },
+                },
+            },
+        },
+        where: {
+            id: roomId,
+        },
+    });
+
+    if (!room) {
+        return returnObj;
+    }
+
+    if (!(roomData.visibility in PrivacyLevel)) {
+        returnObj.message = "Invalid visibility"
+        return returnObj;
+    }
+
+    let roomResult = await prisma.room.update({
+        where: {
+            id: room.id
+        },
+        data: {
+            visibility: roomData.visibility
+        }
+    })
+
+    if (!roomResult) {
+        returnObj.message = "Error editing room";
+        return returnObj;
+    }
+
+    returnObj.message = "Room edited with success";
+    returnObj.status = true;
+    returnObj.obj = roomResult;
+    return returnObj;
+};
+
+module.exports = { getRooms, getRoomById, addRoom, editRoom };
