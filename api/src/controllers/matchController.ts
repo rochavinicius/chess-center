@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+import { MatchModel } from "../models/matchModel";
+import { ReturnObj } from "../util/utils";
 
 const asyncHandler = require("express-async-handler");
 const matchService = require("../services/matchService");
@@ -6,7 +8,7 @@ const matchService = require("../services/matchService");
 exports.getMatches = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log('getMatches');
+            console.log("getMatches");
             let matchResult = await matchService.getMatches();
 
             if (!matchResult.status || !matchResult.obj) {
@@ -56,12 +58,28 @@ exports.getMatchById = asyncHandler(
 
 exports.createMatch = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`);
-    }
-);
+        try {
+            let match: MatchModel = req.body;
 
-exports.editMatch = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-        res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`);
+            let matchResult: ReturnObj = await matchService.addMatch(match);
+
+            if (!matchResult.status || !matchResult.obj) {
+                res.statusCode = 400;
+                res.json(matchResult);
+                return;
+            }
+
+            let createdMatch = matchResult.obj;
+
+            res.statusCode = 201;
+            res.json(createdMatch);
+        } catch (e) {
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
+        }
     }
 );

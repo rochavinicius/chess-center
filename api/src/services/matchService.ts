@@ -10,8 +10,6 @@ const getMatches = async () => {
         status: false,
     };
 
-    console.log(returnObj);
-
     let mathcesList = await prisma.match.findMany({
         include: {
             board: {
