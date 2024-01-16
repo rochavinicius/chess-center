@@ -1,9 +1,9 @@
 import { MoveModel } from "./moveModel";
 
 export interface BoardModel {
-    id: string,
+    id?: string,
     matchId: string,
     state: string,
-    createdAt: Date,
+    createdAt?: Date,
     moves?: MoveModel[]
 }

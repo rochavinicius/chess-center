@@ -1,6 +1,5 @@
-import { Move } from "@prisma/client";
+import { Move, Color } from "@prisma/client";
 import prisma from "../../prisma/prisma";
-import { Color } from "../models/enums";
 import { MoveModel } from "../models/moveModel";
 import { ReturnObj } from "../util/utils";
 

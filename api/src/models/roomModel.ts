@@ -1,4 +1,3 @@
-// import { RoomStatus, Mode, PrivacyLevel } from "./enums";
 import { MatchModel } from "./matchModel";
 import { Mode, PrivacyLevel, RoomStatus } from "@prisma/client";
 
