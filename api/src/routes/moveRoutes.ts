@@ -1,4 +1,5 @@
-import router from "./router"
+const express = require("express");
+const router = express.Router();
 
 const {
     addMove,
@@ -10,4 +11,4 @@ router.post("/", addMove);
 router.get("/:boardId", getMovesByBoardId);
 router.get("/:id", getMoveById);
 
-module.exports = router;
+export default router;

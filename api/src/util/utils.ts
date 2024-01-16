@@ -4,5 +4,5 @@ export const isBlank = (text: string) =>
 export interface ReturnObj {
     message: string;
     obj?: any;
-    status: boolean;
+    success: boolean;
 }

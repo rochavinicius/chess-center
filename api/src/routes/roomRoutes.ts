@@ -1,4 +1,5 @@
-import router from "./router"
+const express = require("express");
+const router = express.Router();
 
 const {
     getRooms,
@@ -15,4 +16,4 @@ router.post("/", createRoom);
 
 router.put("/:roomId", editRoom);
 
-module.exports = router;
+export default router

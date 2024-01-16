@@ -6,7 +6,7 @@ import { ReturnObj } from "../util/utils";
 const addMove = async (newMove: MoveModel) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
-        status: false,
+        success: false,
     };
 
     let board = await prisma.board.findUnique({
@@ -55,7 +55,7 @@ const addMove = async (newMove: MoveModel) => {
         returnObj = {
             message: "Move created",
             obj: createdMove,
-            status: true,
+            success: true,
         };
     }
 
@@ -78,7 +78,7 @@ const getMovesByBoardId = async (boardId: string) => {
 
     return {
         message: "",
-        status: true,
+        success: true,
         obj: board?.move
     } as ReturnObj;
 }
@@ -92,7 +92,7 @@ const getMoveById = async (moveId: string) => {
 
     return {
         message: "",
-        status: true,
+        success: true,
         obj: move
     } as ReturnObj;
 }

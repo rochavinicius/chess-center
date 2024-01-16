@@ -8,7 +8,7 @@ import { ReturnObj, isBlank } from "../util/utils";
 const getRooms = async () => {
     let returnObj: ReturnObj = {
         message: "Rooms not found",
-        status: false,
+        success: false,
     };
     console.log('get rooms');
     let roomList = await prisma.room.findMany({
@@ -31,7 +31,7 @@ const getRooms = async () => {
 
     returnObj.message = "Rooms found";
     returnObj.obj = roomList;
-    returnObj.status = true;
+    returnObj.success = true;
 
     return returnObj;
 };
@@ -39,7 +39,7 @@ const getRooms = async () => {
 const getRoomById = async (roomId: string) => {
     let returnObj: ReturnObj = {
         message: "Room not found",
-        status: false,
+        success: false,
     };
 
     let room = await prisma.room.findUnique({
@@ -65,7 +65,7 @@ const getRoomById = async (roomId: string) => {
 
     returnObj.message = "Room found";
     returnObj.obj = room;
-    returnObj.status = true;
+    returnObj.success = true;
 
     return returnObj;
 };
@@ -73,7 +73,7 @@ const getRoomById = async (roomId: string) => {
 const addRoom = async (newRoom: RoomModel, req: Request) => {
     let returnObj: ReturnObj = {
         message: "Room not created",
-        status: false,
+        success: false,
     };
 
     if (isBlank(newRoom.name)) {
@@ -153,7 +153,7 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
         returnObj = {
             message: "Room created",
             obj: newRoom,
-            status: true,
+            success: true,
         };
 
         return returnObj;
@@ -165,7 +165,7 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
 const editRoom = async (roomId: string, roomData: RoomModel) => {
     let returnObj: ReturnObj = {
         message: "Room not found",
-        status: false,
+        success: false,
     };
 
     let room = await prisma.room.findUnique({
@@ -209,7 +209,7 @@ const editRoom = async (roomId: string, roomData: RoomModel) => {
     }
 
     returnObj.message = "Room edited with success";
-    returnObj.status = true;
+    returnObj.success = true;
     returnObj.obj = roomResult;
     return returnObj;
 };
