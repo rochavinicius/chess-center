@@ -6,7 +6,7 @@ import { ReturnObj } from "../util/utils";
 const addBoard = async (newBoard: BoardModel) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
-        status: false,
+        success: false,
     };
 
     let match = await prisma.match.findUnique({
@@ -35,7 +35,7 @@ const addBoard = async (newBoard: BoardModel) => {
         returnObj = {
             message: "Board created",
             obj: newBoard,
-            status: true,
+            success: true,
         };
 
         return returnObj;

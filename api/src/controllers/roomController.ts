@@ -66,7 +66,7 @@ exports.createRoom = asyncHandler(
             // TODO: Colocar as operacoes de banco dentro de uma transaction
             let roomResult: ReturnObj = await roomService.addRoom(room, req);
 
-            if (!roomResult.status || !roomResult.obj) {
+            if (!roomResult.success || !roomResult.obj) {
                 res.statusCode = 400;
                 res.json(roomResult);
                 return;
@@ -83,7 +83,7 @@ exports.createRoom = asyncHandler(
 
             let matchResult: ReturnObj = await matchService.addMatch(match);
 
-            if (!matchResult.status || !matchResult.obj) {
+            if (!matchResult.success || !matchResult.obj) {
                 res.statusCode = 400;
                 res.json(matchResult);
                 return;
@@ -98,7 +98,7 @@ exports.createRoom = asyncHandler(
 
             let boardResult: ReturnObj = await boardService.addBoard(board);
 
-            if (!boardResult.status || !boardResult.obj) {
+            if (!boardResult.success || !boardResult.obj) {
                 res.statusCode = 400;
                 res.json(boardResult);
                 return;

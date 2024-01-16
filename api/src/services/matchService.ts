@@ -7,7 +7,7 @@ import { randomUUID } from "crypto";
 const getMatches = async () => {
     let returnObj: ReturnObj = {
         message: "Matches not found",
-        status: false,
+        success: false,
     };
 
     console.log(returnObj);
@@ -28,7 +28,7 @@ const getMatches = async () => {
 
     returnObj.message = "Matches found";
     returnObj.obj = mathcesList;
-    returnObj.status = true;
+    returnObj.success = true;
 
     return returnObj;
 };
@@ -36,7 +36,7 @@ const getMatches = async () => {
 const getMatchById = async (matchId: string) => {
     let returnObj: ReturnObj = {
         message: "Match not found",
-        status: false,
+        success: false,
     };
 
     let match = await prisma.match.findUnique({
@@ -58,7 +58,7 @@ const getMatchById = async (matchId: string) => {
 
     returnObj.message = "Match found";
     returnObj.obj = match;
-    returnObj.status = true;
+    returnObj.success = true;
 
     return returnObj;
 };
@@ -66,7 +66,7 @@ const getMatchById = async (matchId: string) => {
 const addMatch = async (newMatch: MatchModel) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
-        status: false,
+        success: false,
     };
 
     let room = await prisma.room.findUnique({
@@ -122,7 +122,7 @@ const addMatch = async (newMatch: MatchModel) => {
         returnObj = {
             message: "Match created",
             obj: newMatch,
-            status: true,
+            success: true,
         };
 
         return returnObj;
