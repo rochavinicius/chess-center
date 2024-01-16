@@ -5,6 +5,71 @@ import prisma from "../../prisma/prisma";
 import { RoomModel } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
 
+const getRooms = async () => {
+    let returnObj: ReturnObj = {
+        message: "Rooms not found",
+        status: false,
+    };
+
+    let roomList = await prisma.room.findMany({
+        include: {
+            match: {
+                include: {
+                    board: {
+                        include: {
+                            move: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    if (!roomList) {
+        return returnObj;
+    }
+
+    returnObj.message = "Rooms found";
+    returnObj.obj = roomList;
+    returnObj.status = true;
+
+    return returnObj;
+};
+
+const getRoomById =async (roomId: string) => {
+    let returnObj: ReturnObj = {
+        message: "Room not found",
+        status: false,
+    };
+
+    let room = await prisma.room.findUnique({
+        include: {
+            match: {
+                include: {
+                    board: {
+                        include: {
+                            move: true,
+                        },
+                    },
+                },
+            },
+        },
+        where: {
+            id: roomId,
+        },
+    });
+
+    if (!room) {
+        return returnObj;
+    }
+
+    returnObj.message = "Room found";
+    returnObj.obj = room;
+    returnObj.status = true;
+
+    return returnObj;
+}
+
 const addRoom = async (newRoom: RoomModel, req: Request) => {
     let returnObj: ReturnObj = {
         message: "Room not created",
@@ -95,4 +160,4 @@ const addRoom = async (newRoom: RoomModel, req: Request) => {
     return returnObj;
 };
 
-module.exports = { addRoom };
+module.exports = { getRooms, getRoomById, addRoom };

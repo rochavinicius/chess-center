@@ -14,28 +14,16 @@ const roomService = require("../services/roomService");
 exports.getRooms = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let roomList = await prisma.room.findMany({
-                include: {
-                    match: {
-                        include: {
-                            board: {
-                                include: {
-                                    move: true
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            let roomsResult = await roomService.getRooms();
 
-            if (!roomList) {
+            if (!roomsResult.status || !roomsResult.obj) {
                 res.statusCode = 400;
-                res.json('Error getting the room list');
+                res.json(roomsResult);
                 return;
             }
 
             res.statusCode = 201;
-            res.json(roomList);
+            res.json(roomsResult);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -50,31 +38,16 @@ exports.getRooms = asyncHandler(
 exports.getRoomById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let room = await prisma.room.findUnique({
-                include: {
-                    match: {
-                        include: {
-                            board: {
-                                include: {
-                                    move: true
-                                }
-                            }
-                        }
-                    }
-                },
-                where: {
-                    id: req.params.roomId
-                }
-            });
+            let roomResult = await roomService.getRoomById(req.params.roomId);
 
-            if (!room) {
+            if (!roomResult.status || !roomResult.obj) {
                 res.statusCode = 400;
-                res.json('Room not found');
+                res.json(roomResult);
                 return;
             }
 
             res.statusCode = 201;
-            res.json(room);
+            res.json(roomResult);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -149,6 +122,15 @@ exports.createRoom = asyncHandler(
 
 exports.editRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`);
+        try {
+            
+        } catch (e) {
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
+        }
     }
 );
