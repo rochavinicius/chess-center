@@ -286,8 +286,8 @@ const commandRoom = async (roomId: string, roomCommand: string) => {
 
             let lastMatchList = room.match.filter(
                 (match) =>
-                    match.status == MatchStatus.STARTED ||
-                    match.status == MatchStatus.READY
+                    match.status === MatchStatus.STARTED ||
+                    match.status === MatchStatus.READY
             );
 
             if (lastMatchList.length > 0) {

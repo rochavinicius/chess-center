@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ReturnObj } from "../util/utils";
 import { MatchStatus } from "@prisma/client";
-import { BoardModel } from "../models/boardModel";
+import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
 
@@ -100,7 +100,7 @@ exports.createRoom = asyncHandler(
 
             let board: BoardModel = {
                 matchId: matchResult.obj.id,
-                state: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", // FEN string of the initial chess state
+                state: BOARD_INITIAL_STATE,
             };
 
             let boardResult: ReturnObj = await boardService.addBoard(board);

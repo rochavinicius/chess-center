@@ -4,7 +4,7 @@ import { MatchModel } from "../models/matchModel";
 import { ReturnObj, isBlank } from "../util/utils";
 import { randomUUID } from "crypto";
 import { MatchCommand } from "../models/matchCommands";
-import { BoardModel } from "../models/boardModel";
+import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 
 const boardService = require("../services/boardService");
 
@@ -86,7 +86,7 @@ const addMatch = async (newMatch: MatchModel) => {
         return returnObj;
     }
 
-    if (room.status == RoomStatus.CLOSED) {
+    if (room.status === RoomStatus.CLOSED) {
         returnObj.message = "Room Closed";
         return returnObj;
     }
@@ -173,7 +173,7 @@ const commandMatch = async (
 
     switch (command) {
         case MatchCommand.FORFEITH:
-            if (match.status == MatchStatus.FINISHED) {
+            if (match.status === MatchStatus.FINISHED) {
                 returnObj.message = "Match is already over";
                 return returnObj;
             }
@@ -183,7 +183,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            if (user != match.white_name && user != match.black_name) {
+            if (user !== match.white_name && user !== match.black_name) {
                 returnObj.message = "User not a player";
                 return returnObj;
             }
@@ -195,7 +195,7 @@ const commandMatch = async (
                 data: {
                     status: MatchStatus.FINISHED,
                     winner:
-                        user == match.white_name ? Color.BLACK : Color.WHITE,
+                        user === match.white_name ? Color.BLACK : Color.WHITE,
                 },
             });
 
@@ -210,16 +210,19 @@ const commandMatch = async (
             };
 
             return returnObj;
-
         case MatchCommand.REMAKE:
-            // TODO: verify if the match is the last match from this room
+            if (match.status === MatchStatus.FINISHED) {
+                returnObj.message = "Match is already over";
+                return returnObj;
+            }
+
             let matchRemake = await prisma.match.update({
                 where: {
                     id: match.id,
                 },
                 data: {
                     status: MatchStatus.READY,
-                    winner: null
+                    winner: null,
                 },
             });
 
@@ -233,8 +236,7 @@ const commandMatch = async (
                     match_id: match.id,
                 },
                 data: {
-                    state: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-                    move: undefined
+                    state: BOARD_INITIAL_STATE,
                 },
             });
 
@@ -243,7 +245,11 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            // TODO: do we need to delete all saved moves from the table?
+            await prisma.move.deleteMany({
+                where: {
+                    board_id: boardRemake.id,
+                },
+            });
 
             returnObj = {
                 message: "Success",
@@ -251,9 +257,8 @@ const commandMatch = async (
             };
 
             return returnObj;
-
         case MatchCommand.REMATCH:
-            if (match.status != MatchStatus.FINISHED) {
+            if (match.status !== MatchStatus.FINISHED) {
                 returnObj.message = "Current match not finished";
                 return returnObj;
             }
@@ -274,7 +279,7 @@ const commandMatch = async (
 
             let board: BoardModel = {
                 matchId: matchRematchResult.obj.id,
-                state: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", // FEN string of the initial chess state
+                state: BOARD_INITIAL_STATE, // FEN string of the initial chess state
             };
 
             let boardResult: ReturnObj = await boardService.addBoard(board);
@@ -290,7 +295,6 @@ const commandMatch = async (
             };
 
             return returnObj;
-
         default:
             break;
     }
