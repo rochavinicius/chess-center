@@ -1,5 +1,5 @@
-//import { MatchStatus } from "./enums";
 import { MatchStatus } from "@prisma/client";
+import { BoardModel } from "./boardModel";
 
 export interface MatchModel {
     id?: string;
@@ -11,4 +11,5 @@ export interface MatchModel {
     startTimestamp?: Date;
     endTimestamp?: Date;
     createdAt?: Date;
+    board?: BoardModel;
 }

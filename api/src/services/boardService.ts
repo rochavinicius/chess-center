@@ -1,5 +1,47 @@
+import { randomUUID } from "crypto";
+import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
+import { ReturnObj } from "../util/utils";
 
-const addBoard = async (newBoard: BoardModel) => {};
+const addBoard = async (newBoard: BoardModel) => {
+    let returnObj: ReturnObj = {
+        message: "Match not created",
+        status: false,
+    };
 
-module.exports = addBoard;
+    console.log(newBoard);
+
+    let match = await prisma.match.findUnique({
+        where: {
+            id: newBoard.matchId,
+        },
+    });
+
+    if (!match) {
+        returnObj.message = "Invalid match";
+        return returnObj;
+    }
+
+    let boardID = randomUUID();
+    let board = await prisma.board.create({
+        data: {
+            id: boardID,
+            match_id: match.id,
+            state: newBoard.state,
+        },
+    });
+
+    if (board) {
+        newBoard.id = board.id;
+
+        returnObj = {
+            message: "Board created",
+            obj: newBoard,
+            status: true,
+        };
+
+        return returnObj;
+    }
+};
+
+module.exports = { addBoard };

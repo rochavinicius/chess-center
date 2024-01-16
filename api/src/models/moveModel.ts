@@ -1,4 +1,3 @@
-// import { Color } from "./enums";
 import { Color } from '@prisma/client';
 
 export interface MoveModel {

@@ -9,10 +9,10 @@ const {
 
 router.get("/", getRooms);
 
-router.get("/:roomID", getRoomById);
+router.get("/:roomId", getRoomById);
 
 router.post("/", createRoom);
 
-router.put("/:roomID", editRoom);
+router.put("/:roomId", editRoom);
 
 module.exports = router;

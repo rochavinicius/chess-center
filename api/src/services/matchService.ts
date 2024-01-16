@@ -10,8 +10,6 @@ const addMatch = async (newMatch: MatchModel) => {
         status: false,
     };
 
-    console.log(newMatch);
-
     let room = await prisma.room.findUnique({
         where: {
             id: newMatch.roomId,
