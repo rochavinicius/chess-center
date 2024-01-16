@@ -4,7 +4,6 @@ import { MatchStatus } from "@prisma/client";
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
-import prisma from "../../prisma/prisma";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");

@@ -4,6 +4,65 @@ import { MatchModel } from "../models/matchModel";
 import { ReturnObj, isBlank } from "../util/utils";
 import { randomUUID } from "crypto";
 
+const getMatches = async () => {
+    let returnObj: ReturnObj = {
+        message: "Matches not found",
+        status: false,
+    };
+
+    console.log(returnObj);
+
+    let mathcesList = await prisma.match.findMany({
+        include: {
+            board: {
+                include: {
+                    move: true,
+                },
+            },
+        },
+    });
+
+    if (!mathcesList) {
+        return returnObj;
+    }
+
+    returnObj.message = "Matches found";
+    returnObj.obj = mathcesList;
+    returnObj.status = true;
+
+    return returnObj;
+};
+
+const getMatchById = async (matchId: string) => {
+    let returnObj: ReturnObj = {
+        message: "Match not found",
+        status: false,
+    };
+
+    let match = await prisma.match.findUnique({
+        include: {
+            board: {
+                include: {
+                    move: true,
+                },
+            },
+        },
+        where: {
+            id: matchId,
+        },
+    });
+
+    if (!match) {
+        return returnObj;
+    }
+
+    returnObj.message = "Match found";
+    returnObj.obj = match;
+    returnObj.status = true;
+
+    return returnObj;
+};
+
 const addMatch = async (newMatch: MatchModel) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
@@ -70,4 +129,4 @@ const addMatch = async (newMatch: MatchModel) => {
     }
 };
 
-module.exports = { addMatch };
+module.exports = { getMatches, getMatchById, addMatch };

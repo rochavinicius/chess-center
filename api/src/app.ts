@@ -32,9 +32,6 @@ main()
     .then(async () => {
         await prisma.$connect();
         console.log("db connected");
-
-        // const allRooms = await prisma.room.findMany()
-        // console.log(allRooms)
     })
     .catch(async (e) => {
         console.error("unpextected error: ", e);

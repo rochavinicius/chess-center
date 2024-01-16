@@ -2,17 +2,17 @@ import router from "./router"
 
 const {
     getMatches,
-    getMatchesById,
+    getMatchById,
     createMatch,
     editMatch,
 } = require("../controllers/matchController.js");
 
 router.get("/", getMatches);
 
-router.get("/:matchID", getMatchesById);
+router.get("/:matchId", getMatchById);
 
 router.post("/", createMatch);
 
-router.put("/:matchID", editMatch);
+router.put("/:matchId", editMatch);
 
 module.exports = router;

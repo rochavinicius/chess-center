@@ -10,7 +10,7 @@ const getRooms = async () => {
         message: "Rooms not found",
         status: false,
     };
-
+    console.log('get rooms');
     let roomList = await prisma.room.findMany({
         include: {
             match: {
