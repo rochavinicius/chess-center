@@ -1,4 +1,3 @@
-// import router from "./router"
 const express = require("express");
 const router = express.Router();
 
@@ -17,5 +16,4 @@ router.post("/", createMatch);
 
 router.post("/:matchId", commandMatch);
 
-// module.exports = router;
 export default router;
