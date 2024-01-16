@@ -11,7 +11,7 @@ exports.getMatches = asyncHandler(
             console.log("getMatches");
             let matchResult = await matchService.getMatches();
 
-            if (!matchResult.status || !matchResult.obj) {
+            if (!matchResult.success || !matchResult.obj) {
                 res.statusCode = 400;
                 res.json(matchResult);
                 return;
@@ -37,7 +37,7 @@ exports.getMatchById = asyncHandler(
                 req.params.roomId
             );
 
-            if (!matchResult.status || !matchResult.obj) {
+            if (!matchResult.success || !matchResult.obj) {
                 res.statusCode = 400;
                 res.json(matchResult);
                 return;
@@ -63,7 +63,7 @@ exports.createMatch = asyncHandler(
 
             let matchResult: ReturnObj = await matchService.addMatch(match);
 
-            if (!matchResult.status || !matchResult.obj) {
+            if (!matchResult.success || !matchResult.obj) {
                 res.statusCode = 400;
                 res.json(matchResult);
                 return;

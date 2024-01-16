@@ -10,7 +10,7 @@ exports.addMove = asyncHandler(
 
             const moveResult = await moveService.addMove(newMove);
 
-            if (!moveResult.status || !moveResult.obj) {
+            if (!moveResult.success || !moveResult.obj) {
                 res.statusCode = 400;
                 res.json(moveResult);
             }

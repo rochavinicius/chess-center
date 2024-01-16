@@ -4,6 +4,7 @@ import { MatchStatus } from "@prisma/client";
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
+import { RoomCommand } from "../models/roomCommands";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
@@ -15,7 +16,7 @@ exports.getRooms = asyncHandler(
         try {
             let roomsResult = await roomService.getRooms();
 
-            if (!roomsResult.status || !roomsResult.obj) {
+            if (!roomsResult.success || !roomsResult.obj) {
                 res.statusCode = 400;
                 res.json(roomsResult);
                 return;
@@ -39,7 +40,7 @@ exports.getRoomById = asyncHandler(
         try {
             let roomResult = await roomService.getRoomById(req.params.roomId);
 
-            if (!roomResult.status || !roomResult.obj) {
+            if (!roomResult.success || !roomResult.obj) {
                 res.statusCode = 400;
                 res.json(roomResult);
                 return;
@@ -122,9 +123,12 @@ exports.createRoom = asyncHandler(
 exports.editRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let roomResult = await roomService.editRoom(req.params.roomId, req.body);
+            let roomResult = await roomService.editRoom(
+                req.params.roomId,
+                req.body
+            );
 
-            if (!roomResult.status || !roomResult.obj) {
+            if (!roomResult.success || !roomResult.obj) {
                 res.statusCode = 400;
                 res.json(roomResult);
                 return;
@@ -132,6 +136,33 @@ exports.editRoom = asyncHandler(
 
             res.statusCode = 200;
             res.json(roomResult.obj);
+        } catch (e) {
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
+        }
+    }
+);
+
+exports.commandRoom = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            let result = await roomService.commandRoom(
+                req.params.roomId,
+                req.body["command"]
+            );
+
+            if (!result.success || !result.obj) {
+                res.statusCode = 400;
+                res.json(result);
+                return;
+            }
+
+            res.statusCode = 200;
+            res.send();
         } catch (e) {
             res.statusCode = 500;
             let response = {

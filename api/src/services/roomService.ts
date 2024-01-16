@@ -1,16 +1,23 @@
-import { Mode, PrivacyLevel, RoomStatus } from "@prisma/client";
+import {
+    MatchStatus,
+    Mode,
+    PrivacyLevel,
+    Room,
+    RoomStatus,
+} from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Request } from "express";
 import prisma from "../../prisma/prisma";
 import { RoomModel } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
+import { RoomCommand } from "../models/roomCommands";
 
 const getRooms = async () => {
     let returnObj: ReturnObj = {
         message: "Rooms not found",
         success: false,
     };
-    console.log('get rooms');
+    console.log("get rooms");
     let roomList = await prisma.room.findMany({
         include: {
             match: {
@@ -190,18 +197,18 @@ const editRoom = async (roomId: string, roomData: RoomModel) => {
     }
 
     if (!(roomData.visibility in PrivacyLevel)) {
-        returnObj.message = "Invalid visibility"
+        returnObj.message = "Invalid visibility";
         return returnObj;
     }
 
     let roomResult = await prisma.room.update({
         where: {
-            id: room.id
+            id: room.id,
         },
         data: {
-            visibility: roomData.visibility
-        }
-    })
+            visibility: roomData.visibility,
+        },
+    });
 
     if (!roomResult) {
         returnObj.message = "Error editing room";
@@ -214,4 +221,87 @@ const editRoom = async (roomId: string, roomData: RoomModel) => {
     return returnObj;
 };
 
-module.exports = { getRooms, getRoomById, addRoom, editRoom };
+const commandRoom = async (roomId: string, roomCommand: string) => {
+    let returnObj: ReturnObj = {
+        message: "Room not found",
+        success: false,
+    };
+
+    let command = RoomCommand[roomCommand as keyof typeof RoomCommand];
+
+    let room = await prisma.room.findUnique({
+        include: {
+            match: {
+                include: {
+                    board: {
+                        include: {
+                            move: true,
+                        },
+                    },
+                },
+            },
+        },
+        where: {
+            id: roomId,
+        },
+    });
+
+    if (!room) {
+        return returnObj;
+    }
+
+    if (!(command in RoomCommand)) {
+        returnObj.message = "Invalid command";
+        return returnObj;
+    }
+
+    switch (command) {
+        case RoomCommand.CLOSE_ROOM_COMMAND:
+            let roomResult = await prisma.room.update({
+                where: {
+                    id: room.id,
+                },
+                data: {
+                    status: RoomStatus.CLOSED,
+                },
+            });
+
+            if (!roomResult) {
+                returnObj.message = "Error closing room";
+                return returnObj;
+            }
+
+            let lastMatchList = room.match.filter(
+                (match) =>
+                    match.status == MatchStatus.STARTED ||
+                    match.status == MatchStatus.READY
+            );
+
+            if (lastMatchList.length > 0) {
+                let lastMatch = lastMatchList[0];
+
+                let matchResult = await prisma.match.update({
+                    where: {
+                        id: lastMatch.id,
+                    },
+                    data: {
+                        status: MatchStatus.FINISHED,
+                    },
+                });
+
+                if (!matchResult) {
+                    returnObj.message = "Error closing match";
+                    return returnObj;
+                }
+            }
+
+            returnObj.message = "Success";
+            returnObj.success = true;
+            return returnObj;
+        default:
+            console.log("default");
+            break;
+    }
+};
+
+module.exports = { getRooms, getRoomById, addRoom, editRoom, commandRoom };
