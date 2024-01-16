@@ -1,4 +1,6 @@
-import router from "./router"
+// import router from "./router"
+const express = require("express");
+const router = express.Router();
 
 const {
     getMatches,
@@ -15,4 +17,5 @@ router.post("/", createMatch);
 
 router.put("/:matchId", editMatch);
 
-module.exports = router;
+// module.exports = router;
+export default router;

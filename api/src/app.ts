@@ -1,26 +1,25 @@
 // api/app.ts
-import express, { Request, Response, NextFunction } from "express";
-import prisma from "../prisma/prisma";
+import express, { NextFunction, Request, Response } from "express";
 import { exit } from "process";
+import prisma from "../prisma/prisma";
+import BoardRoutes from "./routes/boardRoutes";
+import MatchRoutes from "./routes/matchRoutes";
+import MoveRoutes from "./routes/moveRoutes";
+import RoomRoutes from "./routes/roomRoutes";
 
 const app = express();
 const cors = require("cors");
-const room_routes = require("./routes/roomRoutes.js");
-const match_routes = require("./routes/matchRoutes.js");
-const board_routes = require("./routes/boardRoutes.js");
-const move_routes = require("./routes/moveRoutes.js");
 
 async function main() {
     app.use(express.json());
     app.use(cors());
-    app.use("/api/room", room_routes);
-    app.use("/api/match", match_routes);
-    app.use("/api/board", board_routes);
-    app.use("/api/move", move_routes);
+    app.use("/api/room", RoomRoutes);
+    app.use("/api/match", MatchRoutes);
+    app.use("/api/board", BoardRoutes);
+    app.use("/api/move", MoveRoutes);
 
     // Catch unregistered routes
     app.all("*", (req: Request, res: Response, next: NextFunction) => {
-        //var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
         res.status(404).json({ error: `Route ${req.originalUrl} not found` });
     });
 

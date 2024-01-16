@@ -1,4 +1,5 @@
-import router from "./router"
+const express = require("express");
+const router = express.Router();
 
 const {
     getBoard,
@@ -6,4 +7,4 @@ const {
 
 router.get("/", getBoard);
 
-module.exports = router;
+export default router;
