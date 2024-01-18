@@ -1,7 +1,13 @@
-import { Move, Color } from "@prisma/client";
+import { Move, Color, MatchStatus } from "@prisma/client";
 import prisma from "../../prisma/prisma";
 import { MoveModel } from "../models/moveModel";
 import { ReturnObj } from "../util/utils";
+import { Chess, Move as ChessJsMove } from 'chess.js'
+import { BoardModel } from "../models/boardModel";
+import { MatchModel } from "../models/matchModel";
+
+const boardService = require("./boardService");
+const matchService = require("./matchService");
 
 const addMove = async (newMove: MoveModel) => {
     let returnObj: ReturnObj = {
@@ -28,18 +34,36 @@ const addMove = async (newMove: MoveModel) => {
         return returnObj;
     }
 
-    // validate last move color    
+    // validate last move color
+    let firstMove = false;
     if (!board.move || board.move.length !== 0) {
         const lastMove = board.move.sort((m1: Move, m2: Move) => m1.created_at?.getTime() - m2.created_at?.getTime())[board.move.length - 1];
         if (lastMove.color === newMove.color) {
             returnObj.message = "Invalid move";
             return returnObj;
         }
+    } else {
+        firstMove = true;
     }
 
-    // validate if move is possible
-    //TODO
+    // create board
+    const chess = new Chess();
+    chess.load(board.state);
 
+    let move: ChessJsMove;
+    try {
+        move = chess.move(newMove.movement);
+    } catch (e) {
+        returnObj.message = "Illegal move";
+        return returnObj;
+    }
+
+    if (!move) {
+        returnObj.message = "Illegal move";
+        return returnObj;
+    }
+
+    // add move to db
     let createdMove = await prisma.move.create({
         data: {
             board_id: newMove.boardId,
@@ -57,6 +81,83 @@ const addMove = async (newMove: MoveModel) => {
             obj: createdMove,
             success: true,
         };
+    }
+
+    // update board
+    const boardModel: BoardModel = {
+        id: board.id,
+        matchId: board.match_id,
+        state: chess.fen()
+    }
+    let updatedBoard = await boardService.updateBoard(boardModel);
+    if (!updatedBoard.success) {
+        returnObj.message = "Error while updating board";
+        return returnObj;
+    }
+
+    if (firstMove) {
+        let match = await prisma.match.findUnique({
+            where: {
+                id: board.match_id
+            }
+        });
+
+        if (!match) {
+            returnObj.message = "Match not found";
+            return returnObj;
+        }
+
+        const matchModel: MatchModel = {
+            id: match?.id,
+            roomId: match.room_id,
+            status: MatchStatus.STARTED,
+            whiteName: match.white_name,
+            blackName: match.black_name,
+            startTimestamp: new Date(),
+        }
+
+        let updatedMatch = await matchService.updateMatch(matchModel);
+        if (!updatedMatch.success) {
+            returnObj.message = "Error while updating match";
+            return returnObj;
+        }
+    }
+
+    if (chess.isGameOver()) {
+        // finish match
+        let match = await prisma.match.findUnique({
+            where: {
+                id: board.match_id
+            }
+        });
+
+        if (!match) {
+            returnObj.message = "Match not found";
+            return returnObj;
+        }
+
+        if (match.status === MatchStatus.FINISHED) {
+            returnObj.message = "Match already finished";
+            return returnObj;
+        }
+
+        const matchModel: MatchModel = {
+            id: match?.id,
+            roomId: match.room_id,
+            status: MatchStatus.FINISHED,
+            whiteName: match.white_name,
+            blackName: match.black_name,
+            endTimestamp: new Date(),
+        }
+        if (chess.isCheckmate()) {
+            matchModel.winner = move.color as Color | undefined;
+        }
+
+        let updatedMatch = await matchService.updateMatch(matchModel);
+        if (!updatedMatch.success) {
+            returnObj.message = "Error while updating match";
+            return returnObj;
+        }
     }
 
     return returnObj;
