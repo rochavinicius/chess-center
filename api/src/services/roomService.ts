@@ -2,10 +2,9 @@ import { MatchStatus, Mode, PrivacyLevel, RoomStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Request } from "express";
 import prisma from "../../prisma/prisma";
-import { RoomModel } from "../models/roomModel";
-import { ReturnObj, isBlank } from "../util/utils";
 import { RoomCommand } from "../models/roomCommands";
-import { Chess } from "chess.js";
+import { RoomModel, roomModelFromPrisma } from "../models/roomModel";
+import { ReturnObj, isBlank } from "../util/utils";
 
 /**
  * Function that returns a list of rooms
@@ -18,7 +17,6 @@ const getRooms = async () => {
         message: "Rooms not found",
         success: false,
     };
-    console.log("get rooms");
     let roomList = await prisma.room.findMany({
         include: {
             match: {
@@ -37,21 +35,14 @@ const getRooms = async () => {
         return returnObj;
     }
 
-    //TODO map prisma type to models
+    let parsedRooms: RoomModel[] = [];
     for (const room of roomList) {
-        for (const match of room.match) {
-            const board = match.board;
-            const chess = new Chess();
-            if (board) {
-                chess.load(board?.state);
-                // board.board = chess.board();
-            }
-        }
+        parsedRooms.push(roomModelFromPrisma(room));
     }
 
     returnObj = {
         message: "Rooms found",
-        obj: roomList,
+        obj: parsedRooms,
         success: true,
     };
 
@@ -87,7 +78,7 @@ const getRoomById = async (roomId: string) => {
 
     returnObj = {
         message: "Room found",
-        obj: room,
+        obj: roomModelFromPrisma(room),
         success: true,
     };
 
