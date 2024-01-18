@@ -3,7 +3,7 @@ import { Chess, Move as ChessJsMove } from 'chess.js';
 import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
-import { MoveModel } from "../models/moveModel";
+import { MoveModel, moveModelFromPrisma } from "../models/moveModel";
 import { ReturnObj } from "../util/utils";
 
 const boardService = require("./boardService");
@@ -78,7 +78,7 @@ const addMove = async (newMove: MoveModel) => {
 
         returnObj = {
             message: "Move created",
-            obj: createdMove,
+            obj: moveModelFromPrisma(createdMove),
             success: true,
         };
     }
@@ -194,7 +194,7 @@ const getMoveById = async (moveId: string) => {
     return {
         message: "",
         success: true,
-        obj: move
+        obj: moveModelFromPrisma(move)
     } as ReturnObj;
 }
 

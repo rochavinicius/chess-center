@@ -1,6 +1,6 @@
 import { Color, MatchStatus, Prisma, RoomStatus } from "@prisma/client";
 import prisma from "../../prisma/prisma";
-import { MatchModel } from "../models/matchModel";
+import { MatchModel, matchModelFromPrisma } from "../models/matchModel";
 import { ReturnObj, isBlank } from "../util/utils";
 import { randomUUID } from "crypto";
 import { MatchCommand } from "../models/matchCommands";
@@ -260,19 +260,14 @@ const getMatches = async () => {
         return returnObj;
     }
 
-    //TODO map prisma type to models
+    let parsedMatches: MatchModel[] = [];
     for (const match of mathcesList) {
-        const board = match.board;
-        const chess = new Chess();
-        if (board) {
-            chess.load(board?.state);
-            // board.board = chess.board();
-        }
+        parsedMatches.push(matchModelFromPrisma(match));
     }
 
     returnObj = {
         message: "Matches found",
-        obj: mathcesList,
+        obj: parsedMatches,
         success: true,
     };
 
@@ -301,18 +296,10 @@ const getMatchById = async (matchId: string) => {
     if (!match) {
         return returnObj;
     }
-    
-    //TODO map prisma type to models
-    const board = match.board;
-    const chess = new Chess();
-    if (board) {
-        chess.load(board?.state);
-        // board.board = chess.board();
-    }
 
     returnObj = {
         message: "Match found",
-        obj: match,
+        obj: matchModelFromPrisma(match),
         success: true,
     };
 
