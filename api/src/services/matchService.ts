@@ -8,67 +8,6 @@ import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 
 const boardService = require("../services/boardService");
 
-const getMatches = async () => {
-    let returnObj: ReturnObj = {
-        message: "Matches not found",
-        success: false,
-    };
-
-    let mathcesList = await prisma.match.findMany({
-        include: {
-            board: {
-                include: {
-                    move: true,
-                },
-            },
-        },
-    });
-
-    if (!mathcesList) {
-        return returnObj;
-    }
-
-    returnObj = {
-        message: "Matches found",
-        obj: mathcesList,
-        success: true,
-    };
-
-    return returnObj;
-};
-
-const getMatchById = async (matchId: string) => {
-    let returnObj: ReturnObj = {
-        message: "Match not found",
-        success: false,
-    };
-
-    let match = await prisma.match.findUnique({
-        include: {
-            board: {
-                include: {
-                    move: true,
-                },
-            },
-        },
-        where: {
-            id: matchId,
-        },
-    });
-
-    if (!match) {
-        return returnObj;
-    }
-
-    returnObj = {
-        message: "Match found",
-        obj: match,
-        success: true,
-    };
-
-    return returnObj;
-};
-
 const addMatch = async (newMatch: MatchModel) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
@@ -300,4 +239,106 @@ const commandMatch = async (
     }
 };
 
-module.exports = { getMatches, getMatchById, addMatch, commandMatch };
+const getMatches = async () => {
+    let returnObj: ReturnObj = {
+        message: "Matches not found",
+        success: false,
+    };
+
+    let mathcesList = await prisma.match.findMany({
+        include: {
+            board: {
+                include: {
+                    move: true,
+                },
+            },
+        },
+    });
+
+    if (!mathcesList) {
+        return returnObj;
+    }
+
+    returnObj = {
+        message: "Matches found",
+        obj: mathcesList,
+        success: true,
+    };
+
+    return returnObj;
+};
+
+const getMatchById = async (matchId: string) => {
+    let returnObj: ReturnObj = {
+        message: "Match not found",
+        success: false,
+    };
+
+    let match = await prisma.match.findUnique({
+        include: {
+            board: {
+                include: {
+                    move: true,
+                },
+            },
+        },
+        where: {
+            id: matchId,
+        },
+    });
+
+    if (!match) {
+        return returnObj;
+    }
+
+    returnObj = {
+        message: "Match found",
+        obj: match,
+        success: true,
+    };
+
+    return returnObj;
+};
+
+const updateMatch = async (newMatch: MatchModel) => {
+    let returnObj: ReturnObj = {
+        message: "Match not updated",
+        success: false,
+    };
+
+    let currentMatch = await prisma.match.findUnique({
+        where: {
+            id: newMatch.id,
+        },
+    });
+
+    if (!currentMatch) {
+        returnObj.message = "Match not found";
+        return returnObj;
+    }
+
+    let matchResult = await prisma.match.update({
+        where: {
+            id: currentMatch.id,
+        },
+        data: {
+            status: newMatch.status,
+            winner: newMatch.winner,
+            start_timestamp: newMatch.startTimestamp,
+            end_timestamp: newMatch.endTimestamp,
+        },
+    });
+
+    if (!matchResult) {
+        returnObj.message = "Error at updating match";
+        return returnObj;
+    }
+
+    returnObj = {
+        message: "Match updated",
+        success: true,
+    };
+    return returnObj;
+};
+
+module.exports = { addMatch, commandMatch, getMatches, getMatchById, updateMatch };
