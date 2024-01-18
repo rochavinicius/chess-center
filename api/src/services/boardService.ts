@@ -5,7 +5,7 @@ import { ReturnObj } from "../util/utils";
 
 const addBoard = async (newBoard: BoardModel) => {
     let returnObj: ReturnObj = {
-        message: "Match not created",
+        message: "Board not created",
         success: false,
     };
 
@@ -42,4 +42,42 @@ const addBoard = async (newBoard: BoardModel) => {
     }
 };
 
-module.exports = { addBoard };
+const updateBoard = async (newBoard: BoardModel) => {
+    let returnObj: ReturnObj = {
+        message: "Board not updated",
+        success: false,
+    };
+
+    let currentBoard = await prisma.board.findUnique({
+        where: {
+            id: newBoard.id,
+        },
+    });
+
+    if (!currentBoard) {
+        returnObj.message = "Board not found";
+        return returnObj;
+    }
+
+    let boardResult = await prisma.board.update({
+        where: {
+            id: currentBoard.id,
+        },
+        data: {
+            state: newBoard.state,
+        },
+    });
+
+    if (!boardResult) {
+        returnObj.message = "Error at updating board";
+        return returnObj;
+    }
+
+    returnObj = {
+        message: "Board updated",
+        success: true,
+    };
+    return returnObj;
+};
+
+module.exports = { addBoard, updateBoard };
