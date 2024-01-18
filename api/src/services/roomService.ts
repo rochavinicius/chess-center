@@ -11,6 +11,7 @@ import prisma from "../../prisma/prisma";
 import { RoomModel } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
 import { RoomCommand } from "../models/roomCommands";
+import { Chess } from "chess.js";
 
 /**
  * Function that returns a list of rooms
@@ -40,6 +41,18 @@ const getRooms = async () => {
 
     if (!roomList) {
         return returnObj;
+    }
+
+    //TODO map prisma type to models
+    for (const room of roomList) {
+        for (const match of room.match) {
+            const board = match.board;
+            const chess = new Chess();
+            if (board) {
+                chess.load(board?.state);
+                // board.board = chess.board();
+            }
+        }
     }
 
     returnObj = {
@@ -186,17 +199,6 @@ const editRoom = async (roomId: string, roomData: RoomModel) => {
     };
 
     let room = await prisma.room.findUnique({
-        include: {
-            match: {
-                include: {
-                    board: {
-                        include: {
-                            move: true,
-                        },
-                    },
-                },
-            },
-        },
         where: {
             id: roomId,
         },

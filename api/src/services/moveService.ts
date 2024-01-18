@@ -1,10 +1,10 @@
-import { Move, Color, MatchStatus } from "@prisma/client";
+import { Color, MatchStatus, Move } from "@prisma/client";
+import { Chess, Move as ChessJsMove } from 'chess.js';
 import prisma from "../../prisma/prisma";
-import { MoveModel } from "../models/moveModel";
-import { ReturnObj } from "../util/utils";
-import { Chess, Move as ChessJsMove } from 'chess.js'
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
+import { MoveModel } from "../models/moveModel";
+import { ReturnObj } from "../util/utils";
 
 const boardService = require("./boardService");
 const matchService = require("./matchService");

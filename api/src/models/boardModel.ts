@@ -1,3 +1,4 @@
+import { Color, PieceSymbol, Square } from "chess.js";
 import { MoveModel } from "./moveModel";
 
 export interface BoardModel {
@@ -6,6 +7,11 @@ export interface BoardModel {
     state: string;
     createdAt?: Date;
     moves?: MoveModel[];
+    board?: ({
+        square: Square;
+        type: PieceSymbol;
+        color: Color;
+    } | null) [][];
 }
 
 // FEN string of the initial chess state

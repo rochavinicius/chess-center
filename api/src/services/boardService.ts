@@ -1,3 +1,4 @@
+import { Chess } from 'chess.js';
 import { randomUUID } from "crypto";
 import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
@@ -31,6 +32,10 @@ const addBoard = async (newBoard: BoardModel) => {
 
     if (board) {
         newBoard.id = board.id;
+
+        const chess = new Chess();
+        chess.load(board.state);
+        newBoard.board = chess.board();
 
         returnObj = {
             message: "Board created",
@@ -77,6 +82,7 @@ const updateBoard = async (newBoard: BoardModel) => {
         message: "Board updated",
         success: true,
     };
+
     return returnObj;
 };
 

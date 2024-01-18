@@ -5,6 +5,7 @@ import { ReturnObj, isBlank } from "../util/utils";
 import { randomUUID } from "crypto";
 import { MatchCommand } from "../models/matchCommands";
 import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
+import { Chess } from "chess.js";
 
 const boardService = require("../services/boardService");
 
@@ -259,6 +260,16 @@ const getMatches = async () => {
         return returnObj;
     }
 
+    //TODO map prisma type to models
+    for (const match of mathcesList) {
+        const board = match.board;
+        const chess = new Chess();
+        if (board) {
+            chess.load(board?.state);
+            // board.board = chess.board();
+        }
+    }
+
     returnObj = {
         message: "Matches found",
         obj: mathcesList,
@@ -289,6 +300,14 @@ const getMatchById = async (matchId: string) => {
 
     if (!match) {
         return returnObj;
+    }
+    
+    //TODO map prisma type to models
+    const board = match.board;
+    const chess = new Chess();
+    if (board) {
+        chess.load(board?.state);
+        // board.board = chess.board();
     }
 
     returnObj = {
