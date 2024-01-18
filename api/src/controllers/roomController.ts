@@ -4,6 +4,7 @@ import { MatchStatus } from "@prisma/client";
 import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
+import prisma from "../../prisma/prisma";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
@@ -67,55 +68,93 @@ exports.getRoomById = asyncHandler(
 
 exports.createRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
+
         try {
             let room: RoomModel = req.body;
+            let createdRoom = null;
 
-            // TODO: Colocar as operacoes de banco dentro de uma transaction
-            let roomResult: ReturnObj = await roomService.addRoom(room, req);
+            let resultTx = await prisma.$transaction(async (tx) => {
+                // TODO: Colocar as operacoes de banco dentro de uma transaction
+                let roomResult: ReturnObj = await roomService.addRoom(
+                    room,
+                    req,
+                    tx
+                );
 
-            if (!roomResult.success || !roomResult.obj) {
+                if (!roomResult?.success) {
+                    result = {
+                        message: roomResult.message,
+                        success: roomResult.success,
+                    };
+
+                    throw new Error();
+                }
+
+                createdRoom = roomResult.obj;
+
+                let match: MatchModel = {
+                    roomId: createdRoom.id,
+                    status: MatchStatus.READY,
+                    whiteName: createdRoom.playerOne,
+                    blackName: createdRoom.playerTwo,
+                };
+
+                let matchResult: ReturnObj = await matchService.addMatch(
+                    match,
+                    tx
+                );
+
+                if (!matchResult?.success) {
+                    result = {
+                        message: matchResult.message,
+                        success: matchResult.success,
+                    };
+
+                    throw new Error();
+                }
+
+                createdRoom.matches = [matchResult.obj];
+
+                let board: BoardModel = {
+                    matchId: matchResult.obj.id,
+                    state: BOARD_INITIAL_STATE,
+                };
+
+                let boardResult: ReturnObj = await boardService.addBoard(
+                    board,
+                    tx
+                );
+
+                if (!boardResult?.success) {
+                    result = {
+                        message: boardResult.message,
+                        success: boardResult.success,
+                    };
+
+                    throw new Error();
+                }
+
+                createdRoom.matches[0].board = boardResult.obj;
+
+                result = {
+                    message: 'Room created',
+                    success: true,
+                    obj: createdRoom
+                }
+            });
+
+            if (result !== null) {
                 res.statusCode = 400;
-                res.json(roomResult);
-                return;
+                res.json((result as ReturnObj).obj);
             }
-
-            let createdRoom = roomResult.obj;
-
-            let match: MatchModel = {
-                roomId: createdRoom.id,
-                status: MatchStatus.READY,
-                whiteName: createdRoom.playerOne,
-                blackName: createdRoom.playerTwo,
-            };
-
-            let matchResult: ReturnObj = await matchService.addMatch(match);
-
-            if (!matchResult.success || !matchResult.obj) {
-                res.statusCode = 400;
-                res.json(matchResult);
-                return;
-            }
-
-            createdRoom.matches = [matchResult.obj];
-
-            let board: BoardModel = {
-                matchId: matchResult.obj.id,
-                state: BOARD_INITIAL_STATE,
-            };
-
-            let boardResult: ReturnObj = await boardService.addBoard(board);
-
-            if (!boardResult.success || !boardResult.obj) {
-                res.statusCode = 400;
-                res.json(boardResult);
-                return;
-            }
-
-            createdRoom.matches[0].board = boardResult.obj;
-
-            res.statusCode = 201;
-            res.json(createdRoom);
         } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -129,19 +168,22 @@ exports.createRoom = asyncHandler(
 exports.editRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let roomResult = await roomService.editRoom(
-                req.params.roomId,
-                req.body
-            );
+            const result = await prisma.$transaction(async (tx) => {
+                let roomResult = await roomService.editRoom(
+                    req.params.roomId,
+                    req.body,
+                    tx
+                );
 
-            if (!roomResult.success || !roomResult.obj) {
-                res.statusCode = 400;
-                res.json(roomResult);
-                return;
-            }
+                if (!roomResult.success || !roomResult.obj) {
+                    res.statusCode = 400;
+                    res.json(roomResult);
+                    return;
+                }
 
-            res.statusCode = 200;
-            res.json(roomResult.obj);
+                res.statusCode = 200;
+                res.json(roomResult.obj);
+            });
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -156,19 +198,22 @@ exports.editRoom = asyncHandler(
 exports.commandRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let result = await roomService.commandRoom(
-                req.params.roomId,
-                req.body["command"]
-            );
+            const result = await prisma.$transaction(async (tx) => {
+                let result = await roomService.commandRoom(
+                    req.params.roomId,
+                    req.body["command"],
+                    tx
+                );
 
-            if (!result.success || !result.obj) {
-                res.statusCode = 400;
-                res.json(result);
-                return;
-            }
+                if (!result.success || !result.obj) {
+                    res.statusCode = 400;
+                    res.json(result);
+                    return;
+                }
 
-            res.statusCode = 200;
-            res.send();
+                res.statusCode = 200;
+                res.send();
+            });
         } catch (e) {
             res.statusCode = 500;
             let response = {

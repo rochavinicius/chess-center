@@ -1,4 +1,4 @@
-import { Color, MatchStatus, Move } from "@prisma/client";
+import { Color, MatchStatus, Move, PrismaClient } from "@prisma/client";
 import { Chess, Move as ChessJsMove } from "chess.js";
 import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
@@ -9,13 +9,13 @@ import { ReturnObj } from "../util/utils";
 const boardService = require("./boardService");
 const matchService = require("./matchService");
 
-const addMove = async (newMove: MoveModel) => {
+const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
         success: false,
     };
 
-    let board = await prisma.board.findUnique({
+    let board = await tx.board.findUnique({
         include: {
             move: true,
         },
@@ -67,7 +67,7 @@ const addMove = async (newMove: MoveModel) => {
     }
 
     // add move to db
-    let createdMove = await prisma.move.create({
+    let createdMove = await tx.move.create({
         data: {
             board_id: newMove.boardId,
             color: newMove.color,
@@ -82,7 +82,7 @@ const addMove = async (newMove: MoveModel) => {
         returnObj = {
             message: "Move created",
             obj: moveModelFromPrisma(createdMove),
-            success: true,
+            success: false
         };
     }
 
@@ -92,14 +92,14 @@ const addMove = async (newMove: MoveModel) => {
         matchId: board.match_id,
         state: chess.fen(),
     };
-    let updatedBoard = await boardService.updateBoard(boardModel);
+    let updatedBoard = await boardService.updateBoard(boardModel, tx);
     if (!updatedBoard.success) {
         returnObj.message = "Error while updating board";
         return returnObj;
     }
 
     if (firstMove) {
-        let match = await prisma.match.findUnique({
+        let match = await tx.match.findUnique({
             where: {
                 id: board.match_id,
             },
@@ -119,7 +119,7 @@ const addMove = async (newMove: MoveModel) => {
             startTimestamp: new Date(),
         };
 
-        let updatedMatch = await matchService.updateMatch(matchModel);
+        let updatedMatch = await matchService.updateMatch(matchModel, tx);
         if (!updatedMatch.success) {
             returnObj.message = "Error while updating match";
             return returnObj;
@@ -128,9 +128,9 @@ const addMove = async (newMove: MoveModel) => {
 
     if (chess.isGameOver()) {
         // finish match
-        let match = await prisma.match.findUnique({
+        let match = await tx.match.findUnique({
             where: {
-                id: board.match_id,
+                id: '111',
             },
         });
 
@@ -157,13 +157,14 @@ const addMove = async (newMove: MoveModel) => {
             matchModel.winner = newMove.color;
         }
 
-        let updatedMatch = await matchService.updateMatch(matchModel);
+        let updatedMatch = await matchService.updateMatch(matchModel, tx);
         if (!updatedMatch.success) {
             returnObj.message = "Error while updating match";
             return returnObj;
         }
     }
 
+    returnObj.success = true;
     return returnObj;
 };
 

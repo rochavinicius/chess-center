@@ -1,4 +1,4 @@
-import { Color, MatchStatus, Prisma, RoomStatus } from "@prisma/client";
+import { Color, MatchStatus, Prisma, PrismaClient, RoomStatus } from "@prisma/client";
 import prisma from "../../prisma/prisma";
 import { MatchModel, matchModelFromPrisma } from "../models/matchModel";
 import { ReturnObj, isBlank } from "../util/utils";
@@ -9,13 +9,13 @@ import { Chess } from "chess.js";
 
 const boardService = require("../services/boardService");
 
-const addMatch = async (newMatch: MatchModel) => {
+const addMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
         success: false,
     };
 
-    let room = await prisma.room.findUnique({
+    let room = await tx.room.findUnique({
         where: {
             id: newMatch.roomId,
         },
@@ -52,7 +52,7 @@ const addMatch = async (newMatch: MatchModel) => {
     }
 
     let matchId = randomUUID();
-    let match = await prisma.match.create({
+    let match = await tx.match.create({
         data: {
             id: matchId,
             room_id: room.id,
@@ -80,7 +80,8 @@ const addMatch = async (newMatch: MatchModel) => {
 const commandMatch = async (
     matchId: string,
     matchCommand: string,
-    user: string
+    user: string,
+    tx: PrismaClient
 ) => {
     let returnObj: ReturnObj = {
         message: "Match not found",
@@ -89,7 +90,7 @@ const commandMatch = async (
 
     let command = MatchCommand[matchCommand as keyof typeof MatchCommand];
 
-    let match = await prisma.match.findUnique({
+    let match = await tx.match.findUnique({
         include: {
             board: {
                 include: {
@@ -128,7 +129,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            let matchForfeith = await prisma.match.update({
+            let matchForfeith = await tx.match.update({
                 where: {
                     id: match.id,
                 },
@@ -156,7 +157,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            let matchRemake = await prisma.match.update({
+            let matchRemake = await tx.match.update({
                 where: {
                     id: match.id,
                 },
@@ -172,7 +173,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            let boardRemake = await prisma.board.update({
+            let boardRemake = await tx.board.update({
                 where: {
                     match_id: match.id,
                 },
@@ -186,7 +187,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            await prisma.move.deleteMany({
+            await tx.move.deleteMany({
                 where: {
                     board_id: boardRemake.id,
                 },
@@ -211,7 +212,7 @@ const commandMatch = async (
                 blackName: match.white_name,
             };
 
-            let matchRematchResult: ReturnObj = await addMatch(matchRematch);
+            let matchRematchResult: ReturnObj = await addMatch(matchRematch, tx);
 
             if (!matchRematchResult.success || !matchRematchResult.obj) {
                 returnObj.message = "Error trying to create new match";
@@ -223,7 +224,7 @@ const commandMatch = async (
                 state: BOARD_INITIAL_STATE, // FEN string of the initial chess state
             };
 
-            let boardResult: ReturnObj = await boardService.addBoard(board);
+            let boardResult: ReturnObj = await boardService.addBoard(board, tx);
 
             if (!boardResult.success || !boardResult.obj) {
                 returnObj.message = "Error trying to create new board";
@@ -307,13 +308,13 @@ const getMatchById = async (matchId: string) => {
     return returnObj;
 };
 
-const updateMatch = async (newMatch: MatchModel) => {
+const updateMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
         message: "Match not updated",
         success: false,
     };
 
-    let currentMatch = await prisma.match.findUnique({
+    let currentMatch = await tx.match.findUnique({
         where: {
             id: newMatch.id,
         },
@@ -340,7 +341,7 @@ const updateMatch = async (newMatch: MatchModel) => {
         data.winner = newMatch.winner;
     }
 
-    let matchResult = await prisma.match.update({
+    let matchResult = await tx.match.update({
         where: {
             id: currentMatch.id,
         },

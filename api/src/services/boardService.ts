@@ -3,14 +3,15 @@ import { randomUUID } from "crypto";
 import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
 import { ReturnObj } from "../util/utils";
+import { PrismaClient } from '@prisma/client';
 
-const addBoard = async (newBoard: BoardModel) => {
+const addBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
         message: "Board not created",
         success: false,
     };
 
-    let match = await prisma.match.findUnique({
+    let match = await tx.match.findUnique({
         where: {
             id: newBoard.matchId,
         },
@@ -22,7 +23,7 @@ const addBoard = async (newBoard: BoardModel) => {
     }
 
     let boardID = randomUUID();
-    let board = await prisma.board.create({
+    let board = await tx.board.create({
         data: {
             id: boardID,
             match_id: match.id,
@@ -47,13 +48,13 @@ const addBoard = async (newBoard: BoardModel) => {
     }
 };
 
-const updateBoard = async (newBoard: BoardModel) => {
+const updateBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
         message: "Board not updated",
         success: false,
     };
 
-    let currentBoard = await prisma.board.findUnique({
+    let currentBoard = await tx.board.findUnique({
         where: {
             id: newBoard.id,
         },
@@ -64,7 +65,7 @@ const updateBoard = async (newBoard: BoardModel) => {
         return returnObj;
     }
 
-    let boardResult = await prisma.board.update({
+    let boardResult = await tx.board.update({
         where: {
             id: currentBoard.id,
         },
