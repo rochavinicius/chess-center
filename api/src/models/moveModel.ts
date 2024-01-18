@@ -7,3 +7,14 @@ export interface MoveModel {
     movement: string,
     createdAt?: Date,
 }
+
+export const moveModelFromPrisma = (prismaMove: any) => {
+    const move: MoveModel = {
+        id: prismaMove.id,
+        boardId: prismaMove.board_id,
+        color: prismaMove.color,
+        movement: prismaMove.movement,
+        createdAt: prismaMove.created_at,
+    }
+    return move;
+}
