@@ -13,6 +13,7 @@ exports.addMove = asyncHandler(
             if (!moveResult.success || !moveResult.obj) {
                 res.statusCode = 400;
                 res.json(moveResult);
+                return;
             }
             
             res.statusCode = 201;

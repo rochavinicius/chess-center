@@ -34,7 +34,7 @@ exports.getMatchById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             let matchResult = await matchService.getMatchById(
-                req.params.roomId
+                req.params.matchId
             );
 
             if (!matchResult.success || !matchResult.obj) {

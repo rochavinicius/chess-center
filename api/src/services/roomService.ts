@@ -1,10 +1,4 @@
-import {
-    MatchStatus,
-    Mode,
-    PrivacyLevel,
-    Room,
-    RoomStatus,
-} from "@prisma/client";
+import { MatchStatus, Mode, PrivacyLevel, RoomStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Request } from "express";
 import prisma from "../../prisma/prisma";

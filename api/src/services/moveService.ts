@@ -1,5 +1,5 @@
 import { Color, MatchStatus, Move } from "@prisma/client";
-import { Chess, Move as ChessJsMove } from 'chess.js';
+import { Chess, Move as ChessJsMove } from "chess.js";
 import prisma from "../../prisma/prisma";
 import { BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
@@ -17,11 +17,11 @@ const addMove = async (newMove: MoveModel) => {
 
     let board = await prisma.board.findUnique({
         include: {
-            move: true
+            move: true,
         },
         where: {
-            id: newMove.boardId
-        }
+            id: newMove.boardId,
+        },
     });
 
     if (!board) {
@@ -36,10 +36,13 @@ const addMove = async (newMove: MoveModel) => {
 
     // validate last move color
     let firstMove = false;
-    if (!board.move || board.move.length !== 0) {
-        const lastMove = board.move.sort((m1: Move, m2: Move) => m1.created_at?.getTime() - m2.created_at?.getTime())[board.move.length - 1];
+    if (board.move && board.move.length !== 0) {
+        const lastMove = board.move.sort(
+            (m1: Move, m2: Move) =>
+                m1.created_at?.getTime() - m2.created_at?.getTime()
+        )[board.move.length - 1];
         if (lastMove.color === newMove.color) {
-            returnObj.message = "Invalid move";
+            returnObj.message = "Invalid move (same color)";
             return returnObj;
         }
     } else {
@@ -50,16 +53,16 @@ const addMove = async (newMove: MoveModel) => {
     const chess = new Chess();
     chess.load(board.state);
 
-    let move: ChessJsMove;
+    let chessJsMove: ChessJsMove;
     try {
-        move = chess.move(newMove.movement);
+        chessJsMove = chess.move(newMove.movement);
     } catch (e) {
-        returnObj.message = "Illegal move";
+        returnObj.message = "Illegal move (error chess.move)";
         return returnObj;
     }
 
-    if (!move) {
-        returnObj.message = "Illegal move";
+    if (!chessJsMove) {
+        returnObj.message = "Illegal move (move not created)";
         return returnObj;
     }
 
@@ -87,8 +90,8 @@ const addMove = async (newMove: MoveModel) => {
     const boardModel: BoardModel = {
         id: board.id,
         matchId: board.match_id,
-        state: chess.fen()
-    }
+        state: chess.fen(),
+    };
     let updatedBoard = await boardService.updateBoard(boardModel);
     if (!updatedBoard.success) {
         returnObj.message = "Error while updating board";
@@ -98,8 +101,8 @@ const addMove = async (newMove: MoveModel) => {
     if (firstMove) {
         let match = await prisma.match.findUnique({
             where: {
-                id: board.match_id
-            }
+                id: board.match_id,
+            },
         });
 
         if (!match) {
@@ -114,7 +117,7 @@ const addMove = async (newMove: MoveModel) => {
             whiteName: match.white_name,
             blackName: match.black_name,
             startTimestamp: new Date(),
-        }
+        };
 
         let updatedMatch = await matchService.updateMatch(matchModel);
         if (!updatedMatch.success) {
@@ -127,8 +130,8 @@ const addMove = async (newMove: MoveModel) => {
         // finish match
         let match = await prisma.match.findUnique({
             where: {
-                id: board.match_id
-            }
+                id: board.match_id,
+            },
         });
 
         if (!match) {
@@ -148,9 +151,10 @@ const addMove = async (newMove: MoveModel) => {
             whiteName: match.white_name,
             blackName: match.black_name,
             endTimestamp: new Date(),
-        }
+        };
+
         if (chess.isCheckmate()) {
-            matchModel.winner = move.color as Color | undefined;
+            matchModel.winner = newMove.color;
         }
 
         let updatedMatch = await matchService.updateMatch(matchModel);
@@ -168,34 +172,34 @@ const getMovesByBoardId = async (boardId: string) => {
         include: {
             move: {
                 orderBy: {
-                    created_at: 'asc'
-                }
-            }
+                    created_at: "asc",
+                },
+            },
         },
         where: {
-            id: boardId
+            id: boardId,
         },
     });
 
     return {
         message: "",
         success: true,
-        obj: board?.move
+        obj: board?.move,
     } as ReturnObj;
-}
+};
 
 const getMoveById = async (moveId: string) => {
     let move = await prisma.move.findUnique({
         where: {
-            id: moveId
-        }
+            id: moveId,
+        },
     });
 
     return {
         message: "",
         success: true,
-        obj: move
+        obj: move,
     } as ReturnObj;
-}
+};
 
 module.exports = { addMove, getMoveById, getMovesByBoardId };

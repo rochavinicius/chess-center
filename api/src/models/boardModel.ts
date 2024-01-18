@@ -16,4 +16,4 @@ export interface BoardModel {
 
 // FEN string of the initial chess state
 export const BOARD_INITIAL_STATE: string =
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"; 
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; 

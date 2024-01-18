@@ -163,6 +163,7 @@ const commandMatch = async (
                 data: {
                     status: MatchStatus.READY,
                     winner: null,
+                    start_timestamp: null,
                 },
             });
 
@@ -301,7 +302,7 @@ const getMatchById = async (matchId: string) => {
     if (!match) {
         return returnObj;
     }
-    
+
     //TODO map prisma type to models
     const board = match.board;
     const chess = new Chess();
@@ -336,16 +337,27 @@ const updateMatch = async (newMatch: MatchModel) => {
         return returnObj;
     }
 
+    let data: any = {
+        status: newMatch.status,
+    };
+
+    if (newMatch.startTimestamp) {
+        data.start_timestamp = newMatch.startTimestamp;
+    }
+
+    if (newMatch.endTimestamp) {
+        data.end_timestamp = newMatch.endTimestamp;
+    }
+
+    if (newMatch.winner) {
+        data.winner = newMatch.winner;
+    }
+
     let matchResult = await prisma.match.update({
         where: {
             id: currentMatch.id,
         },
-        data: {
-            status: newMatch.status,
-            winner: newMatch.winner,
-            start_timestamp: newMatch.startTimestamp,
-            end_timestamp: newMatch.endTimestamp,
-        },
+        data: data,
     });
 
     if (!matchResult) {
@@ -360,4 +372,10 @@ const updateMatch = async (newMatch: MatchModel) => {
     return returnObj;
 };
 
-module.exports = { addMatch, commandMatch, getMatches, getMatchById, updateMatch };
+module.exports = {
+    addMatch,
+    commandMatch,
+    getMatches,
+    getMatchById,
+    updateMatch,
+};
