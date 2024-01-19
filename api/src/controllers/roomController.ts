@@ -23,7 +23,7 @@ exports.getRooms = asyncHandler(
         try {
             let roomsResult = await roomService.getRooms();
 
-            console.log(req.params);
+            console.log(req.body);
 
             if (!roomsResult.success || !roomsResult.obj) {
                 res.statusCode = 400;
@@ -139,10 +139,10 @@ exports.createRoom = asyncHandler(
                 createdRoom.matches[0].board = boardResult.obj;
 
                 result = {
-                    message: 'Room created',
+                    message: "Room created",
                     success: true,
-                    obj: createdRoom
-                }
+                    obj: createdRoom,
+                };
             });
 
             if (result !== null) {
@@ -185,7 +185,7 @@ exports.editRoom = asyncHandler(
             if (result !== null) {
                 res.statusCode = 200;
                 res.json((result as ReturnObj).obj);
-            }   
+            }
         } catch (e) {
             if (result !== null) {
                 res.statusCode = 400;
