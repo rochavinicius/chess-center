@@ -185,7 +185,7 @@ const getMovesByBoardId = async (boardId: string) => {
     return {
         message: "",
         success: true,
-        obj: board?.move,
+        obj: moveModelFromPrisma(board?.move),
     } as ReturnObj;
 };
 

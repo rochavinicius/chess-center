@@ -258,10 +258,6 @@ const getMatches = async () => {
         },
     });
 
-    if (!mathcesList) {
-        return returnObj;
-    }
-
     let parsedMatches: MatchModel[] = [];
     for (const match of mathcesList) {
         parsedMatches.push(matchModelFromPrisma(match));

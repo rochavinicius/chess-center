@@ -88,7 +88,7 @@ exports.getMatches = asyncHandler(
                 return;
             }
 
-            res.statusCode = 201;
+            res.statusCode = 200;
             res.json(matchResult);
         } catch (e) {
             res.statusCode = 500;
