@@ -1,15 +1,16 @@
-import { Color, MatchStatus, Prisma, PrismaClient, RoomStatus } from "@prisma/client";
+import { Color, MatchStatus, PrismaClient, RoomStatus } from "@prisma/client";
+import { randomUUID } from "crypto";
+import { DecodedIdToken } from "firebase-admin/auth";
 import prisma from "../../prisma/prisma";
+import auth from "../auth/firebase";
+import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
+import { MatchCommand } from "../models/matchCommands";
 import { MatchModel, matchModelFromPrisma } from "../models/matchModel";
 import { ReturnObj, isBlank } from "../util/utils";
-import { randomUUID } from "crypto";
-import { MatchCommand } from "../models/matchCommands";
-import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
-import { Chess } from "chess.js";
 
 const boardService = require("../services/boardService");
 
-const addMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
+const addMatch = async (newMatch: MatchModel, tx: PrismaClient, token: DecodedIdToken) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
         success: false,
@@ -36,18 +37,28 @@ const addMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
         return returnObj;
     }
 
-    if (isBlank(newMatch.whiteName)) {
-        returnObj.message = "Invalid white piece player name";
-        return returnObj;
-    }
+    const tokenName = token.name;
 
-    if (isBlank(newMatch.blackName)) {
-        returnObj.message = "Invalid black piece player name";
+    if (tokenName !== newMatch.whiteName && tokenName !== newMatch.blackName) {
+        returnObj.message = "Cannot create match for another players";
         return returnObj;
     }
 
     if (newMatch.whiteName === newMatch.blackName) {
         returnObj.message = "White and black player names are the same";
+        return returnObj;
+    }
+
+    const usersList = await auth.listUsers();
+    const whiteUser = usersList.users.filter((u) => u.displayName === newMatch.whiteName);
+    const blackUser = usersList.users.filter((u) => u.displayName === newMatch.blackName);
+
+    if (!whiteUser) {
+        returnObj.message = "White user does not exists";
+        return returnObj;
+    }
+    if (!blackUser) {
+        returnObj.message = "Black user does not exists";
         return returnObj;
     }
 
@@ -80,14 +91,15 @@ const addMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
 const commandMatch = async (
     matchId: string,
     matchCommand: string,
-    user: string,
-    tx: PrismaClient
+    tx: PrismaClient,
+    token: DecodedIdToken
 ) => {
     let returnObj: ReturnObj = {
         message: "Match not found",
         success: false,
     };
 
+    const user: string = token.name;
     let command = MatchCommand[matchCommand as keyof typeof MatchCommand];
 
     let match = await tx.match.findUnique({
@@ -212,7 +224,7 @@ const commandMatch = async (
                 blackName: match.white_name,
             };
 
-            let matchRematchResult: ReturnObj = await addMatch(matchRematch, tx);
+            let matchRematchResult: ReturnObj = await addMatch(matchRematch, tx, token);
 
             if (!matchRematchResult.success || !matchRematchResult.obj) {
                 returnObj.message = "Error trying to create new match";

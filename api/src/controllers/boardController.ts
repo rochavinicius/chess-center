@@ -8,7 +8,6 @@ const boardService = require("../services/boardService");
 exports.getBoards = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let token: DecodedIdToken = req.body["token"];
             const boards: ReturnObj = await boardService.getBoards();
 
             res.statusCode = 200;

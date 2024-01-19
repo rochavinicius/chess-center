@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 import { MatchModel } from "../models/matchModel";
 import { ReturnObj } from "../util/utils";
+import { DecodedIdToken } from "firebase-admin/auth";
 
 const asyncHandler = require("express-async-handler");
 const matchService = require("../services/matchService");
@@ -10,12 +11,14 @@ exports.commandMatch = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         let result: ReturnObj | null = null;
         try {
+            let token: DecodedIdToken = req.body["token"];
+
             const resultTx = await prisma.$transaction(async (tx) => {
                 result = await matchService.commandMatch(
                     req.params.matchId,
                     req.body["command"],
-                    req.body["user"],
-                    tx
+                    tx,
+                    token
                 );
 
                 if (!result?.success || !result.obj) {
@@ -50,8 +53,9 @@ exports.createMatch = asyncHandler(
         try {
             const resultTx = await prisma.$transaction(async (tx) => {
                 let match: MatchModel = req.body;
+                let token: DecodedIdToken = req.body["token"];
 
-                result = await matchService.addMatch(match, tx);
+                result = await matchService.addMatch(match, tx, token);
 
                 if (!result?.success || !result.obj) {
                     throw new Error();
