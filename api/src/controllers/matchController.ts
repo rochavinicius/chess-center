@@ -27,8 +27,6 @@ exports.commandMatch = asyncHandler(
                 res.statusCode = 200;
                 res.send();
             }
-
-            console.log(resultTx);
         } catch (e) {
             if (result !== null) {
                 res.statusCode = 400;
@@ -64,8 +62,6 @@ exports.createMatch = asyncHandler(
                 res.statusCode = 201;
                 res.json((result as ReturnObj).obj);
             }
-
-            console.log(resultTx);
         } catch (e) {
             res.statusCode = 500;
             let response = {

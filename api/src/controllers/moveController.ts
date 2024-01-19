@@ -25,7 +25,6 @@ exports.addMove = asyncHandler(
                 res.statusCode = 201;
                 res.json(createdMove);
             }
-            console.log(resultTx);
         } catch (e) {
             if (result !== null) {
                 res.statusCode = 400;
