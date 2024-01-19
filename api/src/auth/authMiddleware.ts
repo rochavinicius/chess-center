@@ -18,7 +18,7 @@ const authToken = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     // now we have a valid token, add to req to other services can use it
-    req.cookies["token"] = decodedToken;
+    req.body["token"] = JSON.stringify(decodedToken);
     next();
 }
 
