@@ -1,9 +1,9 @@
+import { PrismaClient } from '@prisma/client';
 import { Chess } from 'chess.js';
 import { randomUUID } from "crypto";
-import prisma from "../../prisma/prisma";
-import { BoardModel } from "../models/boardModel";
+import prisma from '../../prisma/prisma';
+import { BoardModel, boardModelFromPrisma } from "../models/boardModel";
 import { ReturnObj } from "../util/utils";
-import { PrismaClient } from '@prisma/client';
 
 const addBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
@@ -87,4 +87,55 @@ const updateBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
     return returnObj;
 };
 
-module.exports = { addBoard, updateBoard };
+const getBoardById = async (boardId: string) => {
+    let board = await prisma.board.findUnique({
+        include: {
+            move: {
+                orderBy: {
+                    created_at: "asc",
+                },
+            },
+        },
+        where: {
+            id: boardId,
+        },
+    });
+
+    if (!board) {
+        return {
+            message: "Board not found",
+            success: false,
+        };
+    }
+
+    return {
+        message: "",
+        success: true,
+        obj: boardModelFromPrisma(board),
+    } as ReturnObj;
+}
+
+const getBoards = async () => {
+    let boards = await prisma.board.findMany({
+        include: {
+            move: {
+                orderBy: {
+                    created_at: "asc",
+                },
+            },
+        },
+    });
+
+    let parsedBoards: BoardModel[] = [];
+    for (const board of boards) {
+        parsedBoards.push(boardModelFromPrisma(board));
+    }
+
+    return {
+        message: "",
+        success: true,
+        obj: parsedBoards,
+    } as ReturnObj;
+}
+
+module.exports = { addBoard, updateBoard, getBoardById, getBoards };

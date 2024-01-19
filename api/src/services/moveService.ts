@@ -182,10 +182,17 @@ const getMovesByBoardId = async (boardId: string) => {
         },
     });
 
+    if (!board) {
+        return {
+            message: "Board not found",
+            success: false,
+        };
+    }
+
     return {
         message: "",
         success: true,
-        obj: board?.move,
+        obj: moveModelFromPrisma(board?.move),
     } as ReturnObj;
 };
 
@@ -195,6 +202,13 @@ const getMoveById = async (moveId: string) => {
             id: moveId,
         },
     });
+
+    if (!move) {
+        return {
+            message: "Move not found",
+            success: false,
+        };
+    }
 
     return {
         message: "",

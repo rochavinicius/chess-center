@@ -2,9 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    getBoard,
+    getBoards,
+    getBoardById,
 } = require("../controllers/boardController.js");
 
-router.get("/", getBoard);
+router.get("/", getBoards);
+
+router.get("/:boardId", getBoardById);
 
 export default router;

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 import { ReturnObj } from "../util/utils";
 
@@ -7,28 +7,29 @@ const moveService = require("../services/moveService");
 
 exports.addMove = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        let moveResult: ReturnObj | null = null;
+        let result: ReturnObj | null = null;
 
         try {
-            const result = await prisma.$transaction(async (tx) => {
+            const resultTx = await prisma.$transaction(async (tx) => {
                 let newMove = req.body;
 
-                moveResult = await moveService.addMove(newMove, tx);
+                result = await moveService.addMove(newMove, tx);
 
-                if (!moveResult?.success) {
-                    throw new Error("error");
+                if (!result?.success) {
+                    throw new Error();
                 }
             });
 
-            if (moveResult !== null) {
-                let createdMove = (moveResult as ReturnObj).obj;
-                res.statusCode = 400;
+            if (result !== null) {
+                let createdMove = (result as ReturnObj).obj;
+                res.statusCode = 201;
                 res.json(createdMove);
             }
+            console.log(resultTx);
         } catch (e) {
-            if (moveResult !== null) {
+            if (result !== null) {
                 res.statusCode = 400;
-                res.json(moveResult);
+                res.json(result);
                 return;
             }
 
@@ -49,8 +50,14 @@ exports.getMovesByBoardId = asyncHandler(
 
             const boardMoves = await moveService.getMovesByBoardId(boardId);
 
+            if (!boardMoves.success) {
+                res.statusCode = 400;
+                res.json(boardMoves?.message);
+                return;
+            }
+
             res.statusCode = 200;
-            res.json(boardMoves);
+            res.json(boardMoves.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -69,8 +76,14 @@ exports.getMoveById = asyncHandler(
 
             const move = await moveService.getMoveById(moveId);
 
+            if (!move.success) {
+                res.statusCode = 400;
+                res.json(move?.message);
+                return;
+            }
+
             res.statusCode = 200;
-            res.json(move);
+            res.json(move.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
