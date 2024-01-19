@@ -1,6 +1,8 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { env } from "process";
+
+var admin = require("firebase-admin");
 
 const firebaseConfig = {
     apiKey: env.apiKey,
@@ -12,7 +14,7 @@ const firebaseConfig = {
     measurementId: env.measurementId,
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
+const firebase = initializeApp({credential: admin.credential.cert("./firebase-service-account.json")});
+const auth = getAuth(firebase);
 
 export default auth;

@@ -9,10 +9,12 @@ import RoomRoutes from "./routes/roomRoutes";
 
 const app = express();
 const cors = require("cors");
+const authMiddleware = require("./auth/authMiddleware");
 
 async function main() {
     app.use(express.json());
     app.use(cors());
+    app.use(authMiddleware.authToken);
     app.use("/api/room", RoomRoutes);
     app.use("/api/match", MatchRoutes);
     app.use("/api/board", BoardRoutes);
