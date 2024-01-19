@@ -1,32 +1,41 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+import prisma from "../../prisma/prisma";
 import { MatchModel } from "../models/matchModel";
 import { ReturnObj } from "../util/utils";
-import prisma from "../../prisma/prisma";
 
 const asyncHandler = require("express-async-handler");
 const matchService = require("../services/matchService");
 
 exports.commandMatch = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
         try {
-            const result = await prisma.$transaction(async (tx) => {
-                let result = await matchService.commandMatch(
+            const resultTx = await prisma.$transaction(async (tx) => {
+                result = await matchService.commandMatch(
                     req.params.matchId,
                     req.body["command"],
                     req.body["user"],
                     tx
                 );
 
-                if (!result.success || !result.obj) {
-                    res.statusCode = 400;
-                    res.json(result);
-                    return;
+                if (!result?.success || !result.obj) {
+                    throw new Error();
                 }
+            });
 
+            if (result !== null) {
                 res.statusCode = 200;
                 res.send();
-            });
+            }
+
+            console.log(resultTx);
         } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -39,23 +48,24 @@ exports.commandMatch = asyncHandler(
 
 exports.createMatch = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
         try {
-            const result = await prisma.$transaction(async (tx) => {
+            const resultTx = await prisma.$transaction(async (tx) => {
                 let match: MatchModel = req.body;
 
-                let matchResult: ReturnObj = await matchService.addMatch(match, tx);
+                result = await matchService.addMatch(match, tx);
 
-                if (!matchResult.success || !matchResult.obj) {
-                    res.statusCode = 400;
-                    res.json(matchResult);
-                    return;
+                if (!result?.success || !result.obj) {
+                    throw new Error();
                 }
-
-                let createdMatch = matchResult.obj;
-
-                res.statusCode = 201;
-                res.json(createdMatch);
             });
+
+            if (result !== null) {
+                res.statusCode = 201;
+                res.json((result as ReturnObj).obj);
+            }
+
+            console.log(resultTx);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -66,7 +76,6 @@ exports.createMatch = asyncHandler(
         }
     }
 );
-
 
 exports.getMatches = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

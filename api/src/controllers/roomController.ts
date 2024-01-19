@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { ReturnObj } from "../util/utils";
 import { MatchStatus } from "@prisma/client";
+import { NextFunction, Request, Response } from "express";
+import prisma from "../../prisma/prisma";
 import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
-import prisma from "../../prisma/prisma";
+import { ReturnObj } from "../util/utils";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
@@ -75,7 +75,6 @@ exports.createRoom = asyncHandler(
             let createdRoom = null;
 
             let resultTx = await prisma.$transaction(async (tx) => {
-                // TODO: Colocar as operacoes de banco dentro de uma transaction
                 let roomResult: ReturnObj = await roomService.addRoom(
                     room,
                     req,
@@ -145,9 +144,10 @@ exports.createRoom = asyncHandler(
             });
 
             if (result !== null) {
-                res.statusCode = 400;
+                res.statusCode = 201;
                 res.json((result as ReturnObj).obj);
             }
+            console.log(resultTx);
         } catch (e) {
             if (result !== null) {
                 res.statusCode = 400;
@@ -167,24 +167,33 @@ exports.createRoom = asyncHandler(
 
 exports.editRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
         try {
-            const result = await prisma.$transaction(async (tx) => {
-                let roomResult = await roomService.editRoom(
+            const resultTx = await prisma.$transaction(async (tx) => {
+                result = await roomService.editRoom(
                     req.params.roomId,
                     req.body,
                     tx
                 );
 
-                if (!roomResult.success || !roomResult.obj) {
-                    res.statusCode = 400;
-                    res.json(roomResult);
-                    return;
+                if (!result?.success || !result.obj) {
+                    throw new Error();
                 }
-
-                res.statusCode = 200;
-                res.json(roomResult.obj);
             });
+
+            if (result !== null) {
+                res.statusCode = 200;
+                res.json((result as ReturnObj).obj);
+            }
+
+            console.log(resultTx);     
         } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -197,24 +206,33 @@ exports.editRoom = asyncHandler(
 
 exports.commandRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
         try {
-            const result = await prisma.$transaction(async (tx) => {
-                let result = await roomService.commandRoom(
+            const resultTx = await prisma.$transaction(async (tx) => {
+                result = await roomService.commandRoom(
                     req.params.roomId,
                     req.body["command"],
                     tx
                 );
 
-                if (!result.success || !result.obj) {
-                    res.statusCode = 400;
-                    res.json(result);
-                    return;
+                if (!result?.success || !result.obj) {
+                    throw new Error();
                 }
+            });
 
+            if (result !== null) {
                 res.statusCode = 200;
                 res.send();
-            });
+            }
+
+            console.log(resultTx);
         } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
