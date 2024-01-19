@@ -29,6 +29,12 @@ exports.getBoardById = asyncHandler(
 
             const board: ReturnObj = await boardService.getBoardById(boardId);
 
+            if (!board.success) {
+                res.statusCode = 400;
+                res.json(board?.message);
+                return;
+            }
+
             res.statusCode = 200;
             res.json(board?.obj);
         } catch (e) {

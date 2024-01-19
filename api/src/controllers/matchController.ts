@@ -82,12 +82,6 @@ exports.getMatches = asyncHandler(
         try {
             let matchResult = await matchService.getMatches();
 
-            if (!matchResult.success || !matchResult.obj) {
-                res.statusCode = 400;
-                res.json(matchResult);
-                return;
-            }
-
             res.statusCode = 200;
             res.json(matchResult);
         } catch (e) {
@@ -110,12 +104,12 @@ exports.getMatchById = asyncHandler(
 
             if (!matchResult.success || !matchResult.obj) {
                 res.statusCode = 400;
-                res.json(matchResult);
+                res.json(matchResult.message);
                 return;
             }
 
             res.statusCode = 201;
-            res.json(matchResult);
+            res.json(matchResult.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {

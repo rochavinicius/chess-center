@@ -101,6 +101,13 @@ const getBoardById = async (boardId: string) => {
         },
     });
 
+    if (!board) {
+        return {
+            message: "Board not found",
+            success: false,
+        };
+    }
+
     return {
         message: "",
         success: true,

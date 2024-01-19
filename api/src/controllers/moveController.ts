@@ -50,8 +50,14 @@ exports.getMovesByBoardId = asyncHandler(
 
             const boardMoves = await moveService.getMovesByBoardId(boardId);
 
+            if (!boardMoves.success) {
+                res.statusCode = 400;
+                res.json(boardMoves?.message);
+                return;
+            }
+
             res.statusCode = 200;
-            res.json(boardMoves);
+            res.json(boardMoves.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -70,8 +76,14 @@ exports.getMoveById = asyncHandler(
 
             const move = await moveService.getMoveById(moveId);
 
+            if (!move.success) {
+                res.statusCode = 400;
+                res.json(move?.message);
+                return;
+            }
+
             res.statusCode = 200;
-            res.json(move);
+            res.json(move.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
