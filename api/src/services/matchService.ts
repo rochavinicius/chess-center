@@ -141,8 +141,6 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            console.log('match', match);
-
             let matchForfeith = await tx.match.update({
                 where: {
                     id: match.id,
@@ -154,8 +152,6 @@ const commandMatch = async (
                     end_timestamp: new Date(),
                 },
             });
-
-            console.log('matchForfeith', matchForfeith);
 
             if (!matchForfeith) {
                 returnObj.message = "Error trying to finish the match";
