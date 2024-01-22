@@ -12,7 +12,7 @@ const {
 
 router.get("/", getRooms);
 
-router.get("/:roomId", invite)
+router.get("/invite/:roomId", invite)
 
 router.get("/:roomId", getRoomById);
 
