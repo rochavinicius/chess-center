@@ -61,7 +61,7 @@ const addRoom = async (
         return returnObj;
     }
 
-    if (tokenName=== newRoom.playerTwo) {
+    if (tokenName === newRoom.playerTwo) {
         returnObj.message = "Cannot play against youserlf";
         return returnObj;
     }
@@ -328,4 +328,125 @@ const getRoomById = async (roomId: string) => {
     return returnObj;
 };
 
-module.exports = { getRooms, getRoomById, addRoom, editRoom, commandRoom };
+const invite = async (
+    roomId: string,
+    tx: PrismaClient,
+    token: DecodedIdToken
+) => {
+    let returnObj: ReturnObj = {
+        message: "Error using the invite",
+        success: false,
+    };
+
+    let tokenName: string = token.name;
+    let data: any = {
+        player_two: null,
+    };
+
+    let room = await tx.room.findUnique({
+        where: {
+            id: roomId,
+        },
+    });
+
+    if (!room) {
+        return returnObj;
+    }
+
+    if (room.status === RoomStatus.CLOSED) {
+        returnObj.message = "Room closed";
+        return returnObj;
+    }
+
+    if (room.mode === Mode.SINGLE_PLAYER) {
+        returnObj.message = "Room is in mode single player";
+        return returnObj;
+    }
+
+    if (!tokenName) {
+        returnObj.message = "Username not found";
+        return returnObj;
+    }
+
+    if (room.player_one === tokenName) {
+        returnObj.message = "Player cannot have the same name";
+        return returnObj;
+    }
+
+    if (!room.player_two) {
+        data.player_two = tokenName;
+    }
+
+    // TODO: if you can't enter as player, enter as viewer
+    if (room.player_two !== tokenName) {
+        returnObj.message = "Invite link alreay used";
+        return returnObj;
+    }
+
+    if (room.player_two === tokenName) {
+        data.player_two = tokenName;
+    }
+
+    if (data.player_two) {
+        let roomResult = await tx.room.update({
+            where: {
+                id: room.id,
+            },
+            data: data,
+        });
+
+        if (!roomResult) {
+            returnObj.message = "Error updating the room";
+            return returnObj;
+        }
+
+        let match = await prisma.match.findFirst({
+            include: {
+                board: {
+                    include: {
+                        move: true,
+                    },
+                },
+            },
+            where: {
+                room_id: room.id,
+                status: MatchStatus.READY,
+            },
+        });
+
+        if (!match) {
+            returnObj.message = "Match not found";
+            return returnObj;
+        }
+
+        let matchResult = await tx.match.update({
+            where: {
+                id: match.id,
+            },
+            data: {
+                black_name: data.player_two,
+            },
+        });
+
+        if (!matchResult) {
+            returnObj.message = "Error updating the match";
+            return returnObj;
+        }
+    }
+
+    returnObj = {
+        message: "Success",
+        success: true,
+    };
+
+    return returnObj;
+};
+
+module.exports = {
+    getRooms,
+    getRoomById,
+    addRoom,
+    editRoom,
+    commandRoom,
+    invite,
+};
