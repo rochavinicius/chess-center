@@ -21,7 +21,7 @@ exports.commandMatch = asyncHandler(
                     token
                 );
 
-                if (!result?.success || !result.obj) {
+                if (!result?.success) {
                     throw new Error();
                 }
             });
@@ -57,7 +57,7 @@ exports.createMatch = asyncHandler(
 
                 result = await matchService.addMatch(match, tx, token);
 
-                if (!result?.success || !result.obj) {
+                if (!result?.success) {
                     throw new Error();
                 }
             });

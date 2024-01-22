@@ -23,7 +23,7 @@ exports.commandRoom = asyncHandler(
                     tx
                 );
 
-                if (!result?.success || !result.obj) {
+                if (!result?.success) {
                     throw new Error();
                 }
             });
@@ -161,7 +161,7 @@ exports.editRoom = asyncHandler(
                     tx
                 );
 
-                if (!result?.success || !result.obj) {
+                if (!result?.success) {
                     throw new Error();
                 }
             });

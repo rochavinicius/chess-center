@@ -1,10 +1,8 @@
 {
 	"info": {
-		"_postman_id": "68406ead-4562-4389-a435-5f4ab515095c",
+		"_postman_id": "79dae3f3-88b1-4c27-afe7-e7704a65a3b7",
 		"name": "Chess Center",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26899460",
-		"_collection_link": "https://universal-meadow-44444.postman.co/workspace/Chess-Center~098b7029-b717-4803-a498-e207243b2d09/collection/26899460-68406ead-4562-4389-a435-5f4ab515095c?action=share&source=collection_link&creator=26899460"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -122,7 +120,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"test\",\n    \"status\": \"OPEN\",\n    \"mode\": \"MULTIPLAYER\",\n    \"chatMode\": \"PRIVATE\",\n    \"visibility\": \"PRIVATE\",\n    \"playerOne\": \"Eric\",\n    \"playerTwo\": \"Vini\"\n}",
+							"raw": "{\n\t\"name\": \"test\",\n    \"status\": \"OPEN\",\n    \"mode\": \"MULTIPLAYER\",\n    \"chatMode\": \"PRIVATE\",\n    \"visibility\": \"PRIVATE\",\n    \"playerOne\": \"Test User\",\n    \"playerTwo\": \"Vini\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -162,7 +160,10 @@
 							]
 						},
 						"method": "POST",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				},
