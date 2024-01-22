@@ -12,53 +12,33 @@ const boardService = require("../services/boardService");
 const matchService = require("../services/matchService");
 const roomService = require("../services/roomService");
 
-/**
- * Funtion to get a list of rooms
- *
- * @param req, res, next
- * @returns json
- *
- */
-exports.getRooms = asyncHandler(
+exports.commandRoom = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
         try {
-            let roomsResult = await roomService.getRooms();
+            const resultTx = await prisma.$transaction(async (tx) => {
+                result = await roomService.commandRoom(
+                    req.params.roomId,
+                    req.body["command"],
+                    tx
+                );
 
-            console.log(req.body);
+                if (!result?.success || !result.obj) {
+                    throw new Error();
+                }
+            });
 
-            if (!roomsResult.success || !roomsResult.obj) {
+            if (result !== null) {
+                res.statusCode = 200;
+                res.send();
+            }
+        } catch (e) {
+            if (result !== null) {
                 res.statusCode = 400;
-                res.json(roomsResult);
+                res.json((result as ReturnObj).message);
                 return;
             }
 
-            res.statusCode = 201;
-            res.json(roomsResult);
-        } catch (e) {
-            res.statusCode = 500;
-            let response = {
-                message: "Unexpected error occurred.",
-            };
-            res.json(response);
-            console.error(e);
-        }
-    }
-);
-
-exports.getRoomById = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            let roomResult = await roomService.getRoomById(req.params.roomId);
-
-            if (!roomResult.success || !roomResult.obj) {
-                res.statusCode = 400;
-                res.json(roomResult);
-                return;
-            }
-
-            res.statusCode = 201;
-            res.json(roomResult);
-        } catch (e) {
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -207,33 +187,29 @@ exports.editRoom = asyncHandler(
     }
 );
 
-exports.commandRoom = asyncHandler(
+/**
+ * Funtion to get a list of rooms
+ *
+ * @param req, res, next
+ * @returns json
+ *
+ */
+exports.getRooms = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        let result: ReturnObj | null = null;
         try {
-            const resultTx = await prisma.$transaction(async (tx) => {
-                result = await roomService.commandRoom(
-                    req.params.roomId,
-                    req.body["command"],
-                    tx
-                );
+            let roomsResult = await roomService.getRooms();
 
-                if (!result?.success || !result.obj) {
-                    throw new Error();
-                }
-            });
+            console.log(req.body);
 
-            if (result !== null) {
-                res.statusCode = 200;
-                res.send();
-            }
-        } catch (e) {
-            if (result !== null) {
+            if (!roomsResult.success || !roomsResult.obj) {
                 res.statusCode = 400;
-                res.json((result as ReturnObj).message);
+                res.json(roomsResult);
                 return;
             }
 
+            res.statusCode = 201;
+            res.json(roomsResult);
+        } catch (e) {
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -243,3 +219,49 @@ exports.commandRoom = asyncHandler(
         }
     }
 );
+
+exports.getRoomById = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            let roomResult = await roomService.getRoomById(req.params.roomId);
+
+            if (!roomResult.success || !roomResult.obj) {
+                res.statusCode = 400;
+                res.json(roomResult);
+                return;
+            }
+
+            res.statusCode = 201;
+            res.json(roomResult);
+        } catch (e) {
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
+        }
+    }
+);
+
+exports.invite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        let roomResult = await roomService.getRoomById(req.params.roomId);
+
+        if (!roomResult.success || !roomResult.obj) {
+            res.statusCode = 400;
+            res.json(roomResult);
+            return;
+        }
+
+        res.statusCode = 201;
+        res.json(roomResult);
+    } catch (e) {
+        res.statusCode = 500;
+        let response = {
+            message: "Unexpected error occurred.",
+        };
+        res.json(response);
+        console.error(e);
+    }
+};

@@ -24,10 +24,7 @@ const addRoom = async (
         success: false,
     };
 
-    const tokenName = token.email;
-
-    console.log("token", token);
-    console.log(tokenName);
+    const tokenName: string = token.name;
 
     if (isBlank(newRoom.name)) {
         returnObj.message = "Invalid Name";
@@ -64,7 +61,7 @@ const addRoom = async (
         return returnObj;
     }
 
-    if (newRoom.playerOne === newRoom.playerTwo) {
+    if (tokenName=== newRoom.playerTwo) {
         returnObj.message = "Cannot play against youserlf";
         return returnObj;
     }
@@ -86,7 +83,7 @@ const addRoom = async (
                 "/" +
                 roomId,
             created_by: tokenName,
-            player_one: newRoom.playerOne,
+            player_one: tokenName,
             player_two: newRoom.playerTwo,
             player_one_score: 0,
             player_two_score: 0,
@@ -154,8 +151,8 @@ const commandRoom = async (
     }
 
     switch (command) {
-        case RoomCommand.CLOSE_ROOM_COMMAND:
-            let roomResult = await tx.room.update({
+        case RoomCommand.CLOSE:
+            let roomResult = await prisma.room.update({
                 where: {
                     id: room.id,
                 },
@@ -178,7 +175,7 @@ const commandRoom = async (
             if (lastMatchList.length > 0) {
                 let lastMatch = lastMatchList[0];
 
-                let matchResult = await tx.match.update({
+                let matchResult = await prisma.match.update({
                     where: {
                         id: lastMatch.id,
                     },
@@ -200,7 +197,6 @@ const commandRoom = async (
 
             return returnObj;
         default:
-            console.log("default");
             break;
     }
 };

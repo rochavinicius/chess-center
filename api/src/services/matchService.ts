@@ -99,8 +99,6 @@ const commandMatch = async (
         success: false,
     };
 
-    console.log(token);
-
     const user: string = token.name;
     let command = MatchCommand[matchCommand as keyof typeof MatchCommand];
 
@@ -143,6 +141,8 @@ const commandMatch = async (
                 return returnObj;
             }
 
+            console.log('match', match);
+
             let matchForfeith = await tx.match.update({
                 where: {
                     id: match.id,
@@ -151,8 +151,11 @@ const commandMatch = async (
                     status: MatchStatus.FINISHED,
                     winner:
                         user === match.white_name ? Color.BLACK : Color.WHITE,
+                    end_timestamp: new Date(),
                 },
             });
+
+            console.log('matchForfeith', matchForfeith);
 
             if (!matchForfeith) {
                 returnObj.message = "Error trying to finish the match";
@@ -179,6 +182,7 @@ const commandMatch = async (
                     status: MatchStatus.READY,
                     winner: null,
                     start_timestamp: null,
+                    end_timestamp: null
                 },
             });
 

@@ -25,7 +25,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
     });
 
     if (!board) {
-        returnObj.message = "Invalid boardID";
+        returnObj.message = "Board not found";
         return returnObj;
     }
 
@@ -82,7 +82,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         returnObj = {
             message: "Move created",
             obj: moveModelFromPrisma(createdMove),
-            success: false
+            success: false,
         };
     }
 
@@ -130,7 +130,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         // finish match
         let match = await tx.match.findUnique({
             where: {
-                id: '111',
+                id: board.match_id,
             },
         });
 
@@ -213,7 +213,7 @@ const getMoveById = async (moveId: string) => {
     return {
         message: "",
         success: true,
-        obj: moveModelFromPrisma(move)
+        obj: moveModelFromPrisma(move),
     } as ReturnObj;
 };
 

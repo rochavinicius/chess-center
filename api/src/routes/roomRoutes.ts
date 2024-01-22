@@ -7,9 +7,12 @@ const {
     createRoom,
     editRoom,
     commandRoom,
+    invite
 } = require("../controllers/roomController.js");
 
 router.get("/", getRooms);
+
+router.get("/:roomId", invite)
 
 router.get("/:roomId", getRoomById);
 
