@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import auth from "./firebase";
-import { DecodedIdToken } from "firebase-admin/auth";
 
 const authToken = async (req: Request, res: Response, next: NextFunction) => {
     if (!("authorization" in req.headers)) {

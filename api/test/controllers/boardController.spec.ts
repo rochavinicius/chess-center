@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ReturnObj } from "../util/utils";
+import { DecodedIdToken } from "firebase-admin/auth";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
