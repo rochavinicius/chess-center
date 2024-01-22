@@ -1,27 +1,26 @@
-import { Request } from "express";
-import { ClientRequest } from "node:http";
-import test, { describe } from "node:test";
-import firebase from "../../src/auth/firebase";
+import { Response } from "express";
 
-jest.mock('firebase/app', () => {
+const authMiddleware = require("../../src/auth/authMiddleware");
+
+jest.mock("../../src/auth/firebase", () => {
     return {
-      auth: jest.fn(),
+        auth: {
+            verifyIdToken: jest.fn().mockReturnThis(),
+        }
     };
-  });
-
-const authMiddleware = require('../src/auth/authMiddleware');
+});
 
 // https://jestjs.io/docs/mock-functions
 test("Should authenticate user in request", async () => {
-    let body: string = `
-    {
-        "": ""
-    }
-    `;
+    let req = {
+        headers: {
+        }
+    };
+    const res = {} as unknown as Response;
+    res.json = jest.fn();
+    let next = jest.fn();
 
-    // let req: Request = {
-        // body: body,
-    // };
+    console.log(authMiddleware);
 
-    // await authMiddleware.auth(req, res, next);
+    await authMiddleware.authToken(req, res, next);
 });
