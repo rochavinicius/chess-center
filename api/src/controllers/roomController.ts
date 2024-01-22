@@ -244,24 +244,38 @@ exports.getRoomById = asyncHandler(
     }
 );
 
-exports.invite = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        let roomResult = await roomService.getRoomById(req.params.roomId);
+exports.invite = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        let result: ReturnObj | null = null;
 
-        if (!roomResult.success || !roomResult.obj) {
-            res.statusCode = 400;
-            res.json(roomResult);
-            return;
+        try {
+            const resultTx = await prisma.$transaction(async (tx) => {
+                let token: DecodedIdToken = req.body["token"];
+
+                result = await roomService.invite(req.params.roomId, tx, token);
+
+                if (!result?.success) {
+                    throw new Error();
+                }
+            });
+
+            if (result !== null) {
+                res.statusCode = 200;
+                res.json((result as ReturnObj).message);
+            }
+        } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
+            res.statusCode = 500;
+            let response = {
+                message: "Unexpected error occurred.",
+            };
+            res.json(response);
+            console.error(e);
         }
-
-        res.statusCode = 201;
-        res.json(roomResult);
-    } catch (e) {
-        res.statusCode = 500;
-        let response = {
-            message: "Unexpected error occurred.",
-        };
-        res.json(response);
-        console.error(e);
     }
-};
+);
