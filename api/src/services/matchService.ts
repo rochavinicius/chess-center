@@ -99,6 +99,8 @@ const commandMatch = async (
         success: false,
     };
 
+    console.log(token);
+
     const user: string = token.name;
     let command = MatchCommand[matchCommand as keyof typeof MatchCommand];
 

@@ -5,6 +5,7 @@ import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
 import { ReturnObj } from "../util/utils";
+import { DecodedIdToken } from "firebase-admin/auth";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
@@ -73,14 +74,16 @@ exports.createRoom = asyncHandler(
         let result: ReturnObj | null = null;
 
         try {
-            let room: RoomModel = req.body;
             let createdRoom = null;
+            let room: RoomModel = req.body;
+            let token: DecodedIdToken = req.body["token"];
 
             let resultTx = await prisma.$transaction(async (tx) => {
                 let roomResult: ReturnObj = await roomService.addRoom(
                     room,
                     req,
-                    tx
+                    tx,
+                    token
                 );
 
                 if (!roomResult?.success) {
@@ -103,7 +106,8 @@ exports.createRoom = asyncHandler(
 
                 let matchResult: ReturnObj = await matchService.addMatch(
                     match,
-                    tx
+                    tx,
+                    token
                 );
 
                 if (!matchResult?.success) {

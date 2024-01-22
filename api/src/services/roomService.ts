@@ -1,16 +1,33 @@
-import { MatchStatus, Mode, PrismaClient, PrivacyLevel, RoomStatus } from "@prisma/client";
+import {
+    MatchStatus,
+    Mode,
+    PrismaClient,
+    PrivacyLevel,
+    RoomStatus,
+} from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Request } from "express";
 import prisma from "../../prisma/prisma";
 import { RoomCommand } from "../models/roomCommands";
 import { RoomModel, roomModelFromPrisma } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
+import { DecodedIdToken } from "firebase-admin/auth";
 
-const addRoom = async (newRoom: RoomModel, req: Request, tx: PrismaClient) => {
+const addRoom = async (
+    newRoom: RoomModel,
+    req: Request,
+    tx: PrismaClient,
+    token: DecodedIdToken
+) => {
     let returnObj: ReturnObj = {
         message: "Room not created",
         success: false,
     };
+
+    const tokenName = token.email;
+
+    console.log("token", token);
+    console.log(tokenName);
 
     if (isBlank(newRoom.name)) {
         returnObj.message = "Invalid Name";
@@ -37,7 +54,7 @@ const addRoom = async (newRoom: RoomModel, req: Request, tx: PrismaClient) => {
         return returnObj;
     }
 
-    if (isBlank(newRoom.playerOne)) {
+    if (isBlank(tokenName)) {
         returnObj.message = "Invalid Player One";
         return returnObj;
     }
@@ -68,7 +85,7 @@ const addRoom = async (newRoom: RoomModel, req: Request, tx: PrismaClient) => {
                 req.originalUrl +
                 "/" +
                 roomId,
-            created_by: newRoom.playerOne,
+            created_by: tokenName,
             player_one: newRoom.playerOne,
             player_two: newRoom.playerTwo,
             player_one_score: 0,
@@ -98,51 +115,11 @@ const addRoom = async (newRoom: RoomModel, req: Request, tx: PrismaClient) => {
     return returnObj;
 };
 
-const editRoom = async (roomId: string, roomData: RoomModel, tx: PrismaClient) => {
-    let returnObj: ReturnObj = {
-        message: "Room not found",
-        success: false,
-    };
-
-    let room = await tx.room.findUnique({
-        where: {
-            id: roomId,
-        },
-    });
-
-    if (!room) {
-        return returnObj;
-    }
-
-    if (!(roomData.visibility in PrivacyLevel)) {
-        returnObj.message = "Invalid visibility";
-        return returnObj;
-    }
-
-    let roomResult = await tx.room.update({
-        where: {
-            id: room.id,
-        },
-        data: {
-            visibility: roomData.visibility,
-        },
-    });
-
-    if (!roomResult) {
-        returnObj.message = "Error editing room";
-        return returnObj;
-    }
-
-    returnObj = {
-        message: "Room edited with success",
-        obj: roomResult,
-        success: true,
-    };
-
-    return returnObj;
-};
-
-const commandRoom = async (roomId: string, roomCommand: string, tx: PrismaClient) => {
+const commandRoom = async (
+    roomId: string,
+    roomCommand: string,
+    tx: PrismaClient
+) => {
     let returnObj: ReturnObj = {
         message: "Room not found",
         success: false,
@@ -226,6 +203,54 @@ const commandRoom = async (roomId: string, roomCommand: string, tx: PrismaClient
             console.log("default");
             break;
     }
+};
+
+const editRoom = async (
+    roomId: string,
+    roomData: RoomModel,
+    tx: PrismaClient
+) => {
+    let returnObj: ReturnObj = {
+        message: "Room not found",
+        success: false,
+    };
+
+    let room = await tx.room.findUnique({
+        where: {
+            id: roomId,
+        },
+    });
+
+    if (!room) {
+        return returnObj;
+    }
+
+    if (!(roomData.visibility in PrivacyLevel)) {
+        returnObj.message = "Invalid visibility";
+        return returnObj;
+    }
+
+    let roomResult = await tx.room.update({
+        where: {
+            id: room.id,
+        },
+        data: {
+            visibility: roomData.visibility,
+        },
+    });
+
+    if (!roomResult) {
+        returnObj.message = "Error editing room";
+        return returnObj;
+    }
+
+    returnObj = {
+        message: "Room edited with success",
+        obj: roomResult,
+        success: true,
+    };
+
+    return returnObj;
 };
 
 /**
