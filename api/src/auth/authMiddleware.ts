@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import auth from "./firebase";
 
 const authToken = async (req: Request, res: Response, next: NextFunction) => {
-    if (!("authorization" in req.headers)) {
+    if (!req.headers || !req.headers['authorization']) {
         return res.json({ message: "Authorization header not found" });
     }
 
