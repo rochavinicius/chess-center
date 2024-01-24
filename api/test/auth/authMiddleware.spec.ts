@@ -1,35 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 
+const authMiddleware = require("../../src/auth/authMiddleware");
+
+let mockVerifyIdToken = jest.fn().mockReturnValue(false);
+
+jest.mock("../../src/auth/firebase", () => {
+    return {
+        verifyIdToken: () => mockVerifyIdToken(),
+    };
+});
+
 describe("authToken", () => {
-    // https://jestjs.io/docs/mock-functions
-    // test("should return authorization not in header", async () => {
-    //     let responseObj = {};
-    //     let req = {
-    //         headers: {},
-    //     } as Request;
-    //     let res: Partial<Response> = {
-    //         json: jest.fn().mockImplementation((result) => {
-    //             responseObj = result;
-    //         }),
-    //     };
-    //     let next = {};
-
-    //     res.json = jest.fn();
-    //     // let next = jest.fn();
-
-    //     console.log("test", res);
-
-    //     await authMiddleware.authToken(
-    //         req as Request,
-    //         res as Response,
-    //         next as NextFunction
-    //     );
-
-    //     console.log("res", responseObj);
-
-    //     expect(responseObj).toEqual("Authorization header not found");
-    // });
-
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction = jest.fn();
@@ -45,8 +26,6 @@ describe("authToken", () => {
         const expectedResponse = {
             message: "Authorization header not found",
         };
-        
-        const authMiddleware = require("../../src/auth/authMiddleware");
 
         await authMiddleware.authToken(
             mockRequest as Request,
@@ -65,8 +44,6 @@ describe("authToken", () => {
         mockRequest = {
             headers: {},
         };
-
-        const authMiddleware = require("../../src/auth/authMiddleware");
 
         await authMiddleware.authToken(
             mockRequest as Request,
@@ -88,8 +65,6 @@ describe("authToken", () => {
             },
         };
 
-        const authMiddleware = require("../../src/auth/authMiddleware");
-
         await authMiddleware.authToken(
             mockRequest as Request,
             mockResponse as Response,
@@ -104,13 +79,7 @@ describe("authToken", () => {
             message: "Unauthorized",
         };
 
-        jest.mock("../../src/auth/firebase", () => {
-            return {
-                verifyIdToken: jest.fn().mockReturnValue(true),
-            };
-        });
-
-        const authMiddleware = require("../../src/auth/authMiddleware");
+        mockVerifyIdToken = jest.fn().mockReturnValue(false);
 
         mockRequest = {
             headers: {
@@ -125,5 +94,28 @@ describe("authToken", () => {
         );
 
         expect(mockResponse.json).toHaveBeenCalledWith(expectedResponse);
+    });
+
+    test("with authorization header and authorized token", async () => {
+        const expectedResponse = {
+            message: "Unauthorized",
+        };
+
+        mockVerifyIdToken = jest.fn().mockReturnValue(true);
+
+        mockRequest = {
+            body: {},
+            headers: {
+                authorization: "bearer token",
+            },
+        };
+
+        await authMiddleware.authToken(
+            mockRequest as Request,
+            mockResponse as Response,
+            nextFunction
+        );
+
+        expect(nextFunction).toHaveBeenCalled();
     });
 });
