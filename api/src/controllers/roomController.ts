@@ -199,15 +199,13 @@ exports.getRooms = asyncHandler(
         try {
             let roomsResult = await roomService.getRooms();
 
-            console.log(req.body);
-
             if (!roomsResult.success || !roomsResult.obj) {
                 res.statusCode = 400;
                 res.json(roomsResult);
                 return;
             }
 
-            res.statusCode = 201;
+            res.statusCode = 200;
             res.json(roomsResult);
         } catch (e) {
             res.statusCode = 500;
@@ -231,7 +229,7 @@ exports.getRoomById = asyncHandler(
                 return;
             }
 
-            res.statusCode = 201;
+            res.statusCode = 200;
             res.json(roomResult);
         } catch (e) {
             res.statusCode = 500;

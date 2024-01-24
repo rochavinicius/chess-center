@@ -22,6 +22,10 @@ describe("authToken", () => {
         };
     });
 
+    afterEach(() => {
+        jest.resetAllMocks();
+    });
+
     test("without headers", async () => {
         const expectedResponse = {
             message: "Authorization header not found",
@@ -97,10 +101,6 @@ describe("authToken", () => {
     });
 
     test("with authorization header and authorized token", async () => {
-        const expectedResponse = {
-            message: "Unauthorized",
-        };
-
         mockVerifyIdToken = jest.fn().mockReturnValue(true);
 
         mockRequest = {
