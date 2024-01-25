@@ -11,7 +11,7 @@ const matchService = require("./matchService");
 
 const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
     let returnObj: ReturnObj = {
-        message: "Match not created",
+        message: "Move not created",
         success: false,
     };
 
@@ -189,10 +189,15 @@ const getMovesByBoardId = async (boardId: string) => {
         };
     }
 
+    let moves = [];
+    for (let move of board.move) {
+        moves.push(moveModelFromPrisma(move))
+    }
+
     return {
         message: "",
         success: true,
-        obj: moveModelFromPrisma(board?.move),
+        obj: moves,
     } as ReturnObj;
 };
 

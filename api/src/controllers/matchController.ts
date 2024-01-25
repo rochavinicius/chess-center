@@ -105,7 +105,7 @@ exports.getMatches = asyncHandler(
 exports.getMatchById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let matchResult = await matchService.getMatchById(
+            let matchResult: ReturnObj = await matchService.getMatchById(
                 req.params.matchId
             );
 

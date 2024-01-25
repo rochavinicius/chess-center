@@ -8,7 +8,7 @@ const {
 } = require("../controllers/moveController.js");
 
 router.post("/", addMove);
-router.get("/:boardId", getMovesByBoardId);
-router.get("/:id", getMoveById);
+router.get("/board/:boardId", getMovesByBoardId);
+router.get("/:moveId", getMoveById);
 
 export default router;
