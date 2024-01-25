@@ -48,7 +48,9 @@ exports.getMovesByBoardId = asyncHandler(
         try {
             let boardId = req.params.boardId;
 
-            let boardMoves: ReturnObj = await moveService.getMovesByBoardId(boardId);
+            let boardMoves: ReturnObj = await moveService.getMovesByBoardId(
+                boardId
+            );
 
             if (!boardMoves.success) {
                 res.statusCode = 400;

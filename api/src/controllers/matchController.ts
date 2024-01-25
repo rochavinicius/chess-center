@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { DecodedIdToken } from "firebase-admin/auth";
 import prisma from "../../prisma/prisma";
 import { MatchModel } from "../models/matchModel";
 import { ReturnObj } from "../util/utils";
-import { DecodedIdToken } from "firebase-admin/auth";
 
 const asyncHandler = require("express-async-handler");
 const matchService = require("../services/matchService");

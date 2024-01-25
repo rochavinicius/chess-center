@@ -1,4 +1,3 @@
-import { error } from "console";
 import { NextFunction, Request, Response } from "express";
 
 const boardController = require("../../src/controllers/boardController");

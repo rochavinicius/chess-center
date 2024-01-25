@@ -7,11 +7,11 @@ import {
 } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Request } from "express";
+import { DecodedIdToken } from "firebase-admin/auth";
 import prisma from "../../prisma/prisma";
 import { RoomCommand } from "../models/roomCommands";
 import { RoomModel, roomModelFromPrisma } from "../models/roomModel";
 import { ReturnObj, isBlank } from "../util/utils";
-import { DecodedIdToken } from "firebase-admin/auth";
 
 const addRoom = async (
     newRoom: RoomModel,

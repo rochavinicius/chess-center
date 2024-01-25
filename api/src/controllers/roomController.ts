@@ -1,11 +1,11 @@
 import { MatchStatus } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
+import { DecodedIdToken } from "firebase-admin/auth";
 import prisma from "../../prisma/prisma";
 import { BOARD_INITIAL_STATE, BoardModel } from "../models/boardModel";
 import { MatchModel } from "../models/matchModel";
 import { RoomModel } from "../models/roomModel";
 import { ReturnObj } from "../util/utils";
-import { DecodedIdToken } from "firebase-admin/auth";
 
 const asyncHandler = require("express-async-handler");
 const boardService = require("../services/boardService");
@@ -30,7 +30,7 @@ exports.commandRoom = asyncHandler(
 
             if (result !== null) {
                 res.statusCode = 200;
-                res.send();
+                res.json();
             }
         } catch (e) {
             if (result !== null) {
@@ -197,16 +197,10 @@ exports.editRoom = asyncHandler(
 exports.getRooms = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let roomsResult = await roomService.getRooms();
-
-            if (!roomsResult.success || !roomsResult.obj) {
-                res.statusCode = 400;
-                res.json(roomsResult);
-                return;
-            }
+            let roomsResult: ReturnObj = await roomService.getRooms();
 
             res.statusCode = 200;
-            res.json(roomsResult);
+            res.json(roomsResult.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -221,16 +215,18 @@ exports.getRooms = asyncHandler(
 exports.getRoomById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let roomResult = await roomService.getRoomById(req.params.roomId);
+            let roomResult: ReturnObj = await roomService.getRoomById(
+                req.params.roomId
+            );
 
-            if (!roomResult.success || !roomResult.obj) {
+            if (!roomResult.success) {
                 res.statusCode = 400;
-                res.json(roomResult);
+                res.json(roomResult.message);
                 return;
             }
 
             res.statusCode = 200;
-            res.json(roomResult);
+            res.json(roomResult.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -259,7 +255,7 @@ exports.invite = asyncHandler(
 
             if (result !== null) {
                 res.statusCode = 200;
-                res.json((result as ReturnObj).message);
+                res.json();
             }
         } catch (e) {
             if (result !== null) {
