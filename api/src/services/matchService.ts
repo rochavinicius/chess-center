@@ -10,7 +10,11 @@ import { ReturnObj, isBlank } from "../util/utils";
 
 const boardService = require("../services/boardService");
 
-const addMatch = async (newMatch: MatchModel, tx: PrismaClient, token: DecodedIdToken) => {
+const addMatch = async (
+    newMatch: MatchModel,
+    tx: PrismaClient,
+    token: DecodedIdToken
+) => {
     let returnObj: ReturnObj = {
         message: "Match not created",
         success: false,
@@ -50,8 +54,12 @@ const addMatch = async (newMatch: MatchModel, tx: PrismaClient, token: DecodedId
     }
 
     const usersList = await auth.listUsers();
-    const whiteUser = usersList.users.filter((u) => u.displayName === newMatch.whiteName);
-    const blackUser = usersList.users.filter((u) => u.displayName === newMatch.blackName);
+    const whiteUser = usersList.users.filter(
+        (u) => u.displayName === newMatch.whiteName
+    );
+    const blackUser = usersList.users.filter(
+        (u) => u.displayName === newMatch.blackName
+    );
 
     if (!whiteUser) {
         returnObj.message = "White user does not exists";
@@ -178,7 +186,7 @@ const commandMatch = async (
                     status: MatchStatus.READY,
                     winner: null,
                     start_timestamp: null,
-                    end_timestamp: null
+                    end_timestamp: null,
                 },
             });
 
@@ -226,7 +234,11 @@ const commandMatch = async (
                 blackName: match.white_name,
             };
 
-            let matchRematchResult: ReturnObj = await addMatch(matchRematch, tx, token);
+            let matchRematchResult: ReturnObj = await addMatch(
+                matchRematch,
+                tx,
+                token
+            );
 
             if (!matchRematchResult.success || !matchRematchResult.obj) {
                 returnObj.message = "Error trying to create new match";

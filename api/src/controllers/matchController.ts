@@ -11,12 +11,13 @@ exports.commandMatch = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         let result: ReturnObj | null = null;
         try {
-            let token: DecodedIdToken = req.body["token"];
-
             const resultTx = await prisma.$transaction(async (tx) => {
+                let command: string = req.body["command"];
+                let token: DecodedIdToken = req.body["token"];
+
                 result = await matchService.commandMatch(
                     req.params.matchId,
-                    req.body["command"],
+                    command,
                     tx,
                     token
                 );
@@ -28,7 +29,7 @@ exports.commandMatch = asyncHandler(
 
             if (result !== null) {
                 res.statusCode = 200;
-                res.send();
+                res.json(); // why json() works and send() dont
             }
         } catch (e) {
             if (result !== null) {
@@ -67,6 +68,12 @@ exports.createMatch = asyncHandler(
                 res.json((result as ReturnObj).obj);
             }
         } catch (e) {
+            if (result !== null) {
+                res.statusCode = 400;
+                res.json((result as ReturnObj).message);
+                return;
+            }
+
             res.statusCode = 500;
             let response = {
                 message: "Unexpected error occurred.",
@@ -80,10 +87,10 @@ exports.createMatch = asyncHandler(
 exports.getMatches = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let matchResult = await matchService.getMatches();
+            let matchResult: ReturnObj = await matchService.getMatches();
 
             res.statusCode = 200;
-            res.json(matchResult);
+            res.json(matchResult.obj);
         } catch (e) {
             res.statusCode = 500;
             let response = {
@@ -102,13 +109,13 @@ exports.getMatchById = asyncHandler(
                 req.params.matchId
             );
 
-            if (!matchResult.success || !matchResult.obj) {
+            if (!matchResult.success) {
                 res.statusCode = 400;
                 res.json(matchResult.message);
                 return;
             }
 
-            res.statusCode = 201;
+            res.statusCode = 200;
             res.json(matchResult.obj);
         } catch (e) {
             res.statusCode = 500;

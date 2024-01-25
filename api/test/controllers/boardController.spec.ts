@@ -11,13 +11,13 @@ const mockBoard = {
     moves: [],
 };
 
-let mockGetBoardsReturn = jest.fn().mockReturnValue({
+let mockGetBoards = jest.fn().mockReturnValue({
     message: "",
     success: true,
     obj: [],
 });
 
-let mockgetBoardByIdReturn = jest.fn().mockReturnValue({
+let mockgetBoardById = jest.fn().mockReturnValue({
     message: "",
     success: true,
     obj: {},
@@ -25,8 +25,8 @@ let mockgetBoardByIdReturn = jest.fn().mockReturnValue({
 
 jest.mock("../../src/services/boardService", () => {
     return {
-        getBoards: () => mockGetBoardsReturn(),
-        getBoardById: () => mockgetBoardByIdReturn(),
+        getBoards: () => mockGetBoards(),
+        getBoardById: () => mockgetBoardById(),
     };
 });
 
@@ -46,28 +46,10 @@ describe("boardController", () => {
         jest.resetAllMocks();
     });
 
-    test("getBoards should return error at retrieving list of boards", async () => {
-        const expectedResponse = "Boards not found";
-
-        mockGetBoardsReturn = jest.fn().mockReturnValue({
-            message: "Boards not found",
-            success: false,
-        });
-
-        await boardController.getBoards(
-            mockRequest as Request,
-            mockResponse as Response,
-            nextFunction
-        );
-
-        expect(mockResponse.statusCode).toEqual(400);
-        expect(mockResponse.json).toHaveBeenCalledWith(expectedResponse);
-    });
-
     test("getBoards should return a list of boards", async () => {
         const expectedResponse = [mockBoard];
 
-        mockGetBoardsReturn = jest.fn().mockReturnValue({
+        mockGetBoards = jest.fn().mockReturnValue({
             message: "",
             success: true,
             obj: [mockBoard],
@@ -84,7 +66,7 @@ describe("boardController", () => {
     });
 
     test("getBoards should handle error", async () => {
-        mockGetBoardsReturn = jest.fn().mockImplementation(() => {
+        mockGetBoards = jest.fn().mockImplementation(() => {
             throw new Error("Fatal error");
         });
 
@@ -106,7 +88,7 @@ describe("boardController", () => {
             },
         };
 
-        mockgetBoardByIdReturn = jest.fn().mockReturnValue({
+        mockgetBoardById = jest.fn().mockReturnValue({
             message: "Board not found",
             success: false,
         });
@@ -130,7 +112,7 @@ describe("boardController", () => {
             },
         };
 
-        mockgetBoardByIdReturn = jest.fn().mockReturnValue({
+        mockgetBoardById = jest.fn().mockReturnValue({
             message: "",
             success: true,
             obj: mockBoard,
@@ -147,7 +129,7 @@ describe("boardController", () => {
     });
 
     test("getBoardById should handle error", async () => {
-        mockgetBoardByIdReturn = jest.fn().mockImplementation(() => {
+        mockgetBoardById = jest.fn().mockImplementation(() => {
             throw new Error("Fatal error");
         });
 

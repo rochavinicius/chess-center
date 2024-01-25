@@ -98,13 +98,6 @@ const getBoards = async () => {
         },
     });
 
-    if (!boards) {
-        return {
-            message: "Boards not found",
-            success: false,
-        };
-    }
-
     let parsedBoards: BoardModel[] = [];
     for (const board of boards) {
         parsedBoards.push(boardModelFromPrisma(board));

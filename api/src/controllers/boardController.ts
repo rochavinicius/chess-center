@@ -7,23 +7,15 @@ const boardService = require("../services/boardService");
 exports.getBoards = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const boardsResult: ReturnObj = await boardService.getBoards();
-
-            if (!boardsResult.success) {
-                res.statusCode = 400;
-                res.json(boardsResult.message);
-                return;
-            }
+            let boardsResult: ReturnObj = await boardService.getBoards();
 
             res.statusCode = 200;
             res.json(boardsResult.obj);
         } catch (e) {
             res.statusCode = 500;
-
             let response = {
                 message: "Unexpected error occurred.",
             };
-
             console.error(e);
             res.json(response);
         }
@@ -35,7 +27,9 @@ exports.getBoardById = asyncHandler(
         try {
             let boardId = req.params.boardId;
 
-            const boardResult: ReturnObj = await boardService.getBoardById(boardId);
+            let boardResult: ReturnObj = await boardService.getBoardById(
+                boardId
+            );
 
             if (!boardResult.success) {
                 res.statusCode = 400;

@@ -174,7 +174,7 @@ const config: Config = {
   // A map from regular expressions to paths to transformers
   transform: {
     '^.+\\.ts?$': 'ts-jest'
-  }
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
@@ -193,6 +193,8 @@ const config: Config = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
+
+  setupFilesAfterEnv: ['./test/singleton.ts'],
 };
 
 export default config;
