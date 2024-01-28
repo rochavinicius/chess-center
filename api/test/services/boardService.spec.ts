@@ -21,7 +21,6 @@ const defaultMatch: Match = {
 }
 
 describe("boardService", () => {
-
     test("Should not create board with invalid match", async () => {
         const expectedRet: ReturnObj = {
             message: "Invalid match",
