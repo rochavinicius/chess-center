@@ -318,7 +318,7 @@ describe("matchService", () => {
     });
 
     test("", async () => {
-
+        //TODO add command tests
     });
 
     test("Should get empty matches", async () => {
