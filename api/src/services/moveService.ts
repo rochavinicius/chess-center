@@ -37,10 +37,11 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
     // validate last move color
     let firstMove = false;
     if (board.move && board.move.length !== 0) {
-        const lastMove = board.move.sort(
-            (m1: Move, m2: Move) =>
+        let lastMove = board.move.sort(
+            (m1: Move, m2: Move) => 
                 m1.created_at?.getTime() - m2.created_at?.getTime()
         )[board.move.length - 1];
+
         if (lastMove.color === newMove.color) {
             returnObj.message = "Invalid move (same color)";
             return returnObj;
@@ -58,11 +59,6 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         chessJsMove = chess.move(newMove.movement);
     } catch (e) {
         returnObj.message = "Illegal move (error chess.move)";
-        return returnObj;
-    }
-
-    if (!chessJsMove) {
-        returnObj.message = "Illegal move (move not created)";
         return returnObj;
     }
 
@@ -92,7 +88,9 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         matchId: board.match_id,
         state: chess.fen(),
     };
+
     let updatedBoard = await boardService.updateBoard(boardModel, tx);
+
     if (!updatedBoard.success) {
         returnObj.message = "Error while updating board";
         return returnObj;
@@ -111,7 +109,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         }
 
         const matchModel: MatchModel = {
-            id: match?.id,
+            id: match.id,
             roomId: match.room_id,
             status: MatchStatus.STARTED,
             whiteName: match.white_name,
@@ -120,6 +118,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         };
 
         let updatedMatch = await matchService.updateMatch(matchModel, tx);
+
         if (!updatedMatch.success) {
             returnObj.message = "Error while updating match";
             return returnObj;
@@ -145,7 +144,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         }
 
         const matchModel: MatchModel = {
-            id: match?.id,
+            id: match.id,
             roomId: match.room_id,
             status: MatchStatus.FINISHED,
             whiteName: match.white_name,
@@ -158,6 +157,7 @@ const addMove = async (newMove: MoveModel, tx: PrismaClient) => {
         }
 
         let updatedMatch = await matchService.updateMatch(matchModel, tx);
+
         if (!updatedMatch.success) {
             returnObj.message = "Error while updating match";
             return returnObj;
@@ -186,7 +186,7 @@ const getMovesByBoardId = async (boardId: string) => {
         return {
             message: "Board not found",
             success: false,
-        };
+        } as ReturnObj;
     }
 
     let moves = [];
