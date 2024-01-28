@@ -37,6 +37,7 @@ const addBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
         const chess = new Chess();
         chess.load(board.state);
         newBoard.board = chess.board();
+        newBoard.createdAt = board.created_at;
 
         returnObj = {
             message: "Board created",
@@ -73,11 +74,6 @@ const updateBoard = async (newBoard: BoardModel, tx: PrismaClient) => {
             state: newBoard.state,
         },
     });
-
-    if (!boardResult) {
-        returnObj.message = "Error at updating board";
-        return returnObj;
-    }
 
     returnObj = {
         message: "Board updated",
