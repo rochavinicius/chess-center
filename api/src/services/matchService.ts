@@ -27,12 +27,12 @@ const addMatch = async (
     });
 
     if (!room) {
-        returnObj.message = "Invalid Room";
+        returnObj.message = "Invalid room";
         return returnObj;
     }
 
     if (room.status === RoomStatus.CLOSED) {
-        returnObj.message = "Room Closed";
+        returnObj.message = "Room closed";
         return returnObj;
     }
 
@@ -61,11 +61,11 @@ const addMatch = async (
         (u) => u.displayName === newMatch.blackName
     );
 
-    if (!whiteUser) {
+    if (!whiteUser || whiteUser.length == 0) {
         returnObj.message = "White user does not exists";
         return returnObj;
     }
-    if (!blackUser) {
+    if (!blackUser || blackUser.length == 0) {
         returnObj.message = "Black user does not exists";
         return returnObj;
     }
@@ -81,12 +81,8 @@ const addMatch = async (
         },
     });
 
-    if (!match) {
-        returnObj.message = "Error trying to create match";
-        return returnObj;
-    }
-
     newMatch.id = match.id;
+    newMatch.createdAt = match.created_at;
     returnObj = {
         message: "Match created",
         obj: newMatch,
@@ -269,11 +265,6 @@ const commandMatch = async (
 };
 
 const getMatches = async () => {
-    let returnObj: ReturnObj = {
-        message: "Matches not found",
-        success: false,
-    };
-
     let mathcesList = await prisma.match.findMany({
         include: {
             board: {
@@ -289,13 +280,11 @@ const getMatches = async () => {
         parsedMatches.push(matchModelFromPrisma(match));
     }
 
-    returnObj = {
+    return {
         message: "Matches found",
         obj: parsedMatches,
         success: true,
-    };
-
-    return returnObj;
+    } as ReturnObj;
 };
 
 const getMatchById = async (matchId: string) => {
@@ -363,17 +352,12 @@ const updateMatch = async (newMatch: MatchModel, tx: PrismaClient) => {
         data.winner = newMatch.winner;
     }
 
-    let matchResult = await tx.match.update({
+    await tx.match.update({
         where: {
             id: currentMatch.id,
         },
         data: data,
     });
-
-    if (!matchResult) {
-        returnObj.message = "Error at updating match";
-        return returnObj;
-    }
 
     returnObj = {
         message: "Match updated",
