@@ -1,6 +1,5 @@
-import { Move, MatchStatus } from "@prisma/client";
-import { Chess } from "chess.js";
-import { BOARD_INITIAL_STATE, BoardModel } from "../../src/models/boardModel";
+import { MatchStatus } from "@prisma/client";
+import { BOARD_INITIAL_STATE } from "../../src/models/boardModel";
 import { ReturnObj } from "../../src/util/utils";
 import { prismaMock } from "../singleton";
 
@@ -222,7 +221,7 @@ describe("moveService", () => {
     test("Should not create move when occurs error while updating board", async () => {
         let expectedRet: ReturnObj = {
             message: "Error while updating board",
-            success: false
+            success: false,
         };
 
         let newMove = {
@@ -415,7 +414,7 @@ describe("moveService", () => {
                 createdAt: new Date("January 28, 2024 03:24:00"),
                 id: "c8f6cff3-77cc-4020-adee-7c63172a3dca",
                 movement: "e4",
-            }
+            },
         };
 
         let newMove = {
@@ -437,7 +436,7 @@ describe("moveService", () => {
         mockUpdateMatch = jest.fn().mockReturnValue({
             message: "Match updated",
             success: true,
-            obj: mockMatch
+            obj: mockMatch,
         });
 
         prismaMock.board.findUnique.mockResolvedValue(mockBoard);
@@ -473,7 +472,7 @@ describe("moveService", () => {
         let expectedRet: ReturnObj = {
             message: "",
             success: true,
-            obj: moves
+            obj: moves,
         };
 
         prismaMock.board.findUnique.mockResolvedValue(mockBoard);
@@ -508,18 +507,16 @@ describe("moveService", () => {
                 color: "BLACK",
                 movement: "g5",
                 createdAt: new Date("January 28, 2024 03:27:00"),
-            }
+            },
         };
 
-        prismaMock.move.findUnique.mockResolvedValue(
-            {
-                id: "09383429-5af0-4299-9d0b-70a9a23557f4",
-                board_id: "894d8905-cd2d-49ee-a6a8-57cf61c06203",
-                color: "BLACK",
-                movement: "g5",
-                created_at: new Date("January 28, 2024 03:27:00"),
-            }
-        );
+        prismaMock.move.findUnique.mockResolvedValue({
+            id: "09383429-5af0-4299-9d0b-70a9a23557f4",
+            board_id: "894d8905-cd2d-49ee-a6a8-57cf61c06203",
+            color: "BLACK",
+            movement: "g5",
+            created_at: new Date("January 28, 2024 03:27:00"),
+        });
 
         let moveId = "5d3cbbb5-9ac0-477d-9661-653054b4fb53";
         let result = await moveService.getMoveById(moveId);
