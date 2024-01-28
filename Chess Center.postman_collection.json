@@ -1,8 +1,10 @@
 {
 	"info": {
-		"_postman_id": "79dae3f3-88b1-4c27-afe7-e7704a65a3b7",
+		"_postman_id": "d451008d-620e-443d-92c4-398a25193dae",
 		"name": "Chess Center",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26899460",
+		"_collection_link": "https://universal-meadow-44444.postman.co/workspace/Chess-Center~098b7029-b717-4803-a498-e207243b2d09/collection/26899460-d451008d-620e-443d-92c4-398a25193dae?action=share&source=collection_link&creator=26899460"
 	},
 	"item": [
 		{
@@ -84,6 +86,41 @@
 								"api",
 								"room",
 								"26b27f25-e30c-48d2-bf03-7378a3161b92"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invite",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{id_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/room/invite/fc988055-92ea-4904-a45e-213c6ec97253",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"room",
+								"invite",
+								"fc988055-92ea-4904-a45e-213c6ec97253"
 							]
 						}
 					},
@@ -359,7 +396,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:3000/api/match/14464599-605b-4527-8e15-62fd46f1d1e0",
+							"raw": "http://127.0.0.1:3000/api/match/0dd636c2-1644-49a5-af83-0148a4142cc4",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -371,7 +408,7 @@
 							"path": [
 								"api",
 								"match",
-								"14464599-605b-4527-8e15-62fd46f1d1e0"
+								"0dd636c2-1644-49a5-af83-0148a4142cc4"
 							]
 						}
 					},
@@ -382,6 +419,166 @@
 		{
 			"name": "Board",
 			"item": [
+				{
+					"name": "Get Boards",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Auth Test User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"pm.globals.set(\"id_token\", jsonData.idToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"vinir.inter@hotmail.com\",\r\n    \"password\": \"123456\",\r\n    \"returnSecureToken\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw",
+							"protocol": "https",
+							"host": [
+								"www",
+								"googleapis",
+								"com"
+							],
+							"path": [
+								"identitytoolkit",
+								"v3",
+								"relyingparty",
+								"verifyPassword"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth Test User 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"pm.globals.set(\"id_token\", jsonData.idToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"xatek57817@trackden.com\",\r\n    \"password\": \"123456\",\r\n    \"returnSecureToken\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw",
+							"protocol": "https",
+							"host": [
+								"www",
+								"googleapis",
+								"com"
+							],
+							"path": [
+								"identitytoolkit",
+								"v3",
+								"relyingparty",
+								"verifyPassword"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Move",
+			"item": [
+				{
+					"name": "Get moves by id",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get moves by board id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{id_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/move/5d3cbbb5-9ac0-477d-9661-653054b4fb53",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"move",
+								"5d3cbbb5-9ac0-477d-9661-653054b4fb53"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Move 1",
 					"request": {
@@ -587,61 +784,6 @@
 							"path": [
 								"api",
 								"move"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Req Auth",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);\r",
-									"pm.globals.set(\"id_token\", jsonData.idToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"vinir.inter@hotmail.com\",\r\n    \"password\": \"123456\",\r\n    \"returnSecureToken\": true\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw",
-							"protocol": "https",
-							"host": [
-								"www",
-								"googleapis",
-								"com"
-							],
-							"path": [
-								"identitytoolkit",
-								"v3",
-								"relyingparty",
-								"verifyPassword"
-							],
-							"query": [
-								{
-									"key": "key",
-									"value": "AIzaSyCn64wuBzj3ohEriLINT7oY-3wagxRzmPw"
-								}
 							]
 						}
 					},
