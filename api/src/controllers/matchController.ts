@@ -22,16 +22,17 @@ exports.commandMatch = asyncHandler(
                     token
                 );
 
-                if (!result?.success) {
+                if (result && !result.success) {
                     throw new Error();
                 }
             });
 
             if (result !== null) {
                 res.statusCode = 200;
-                res.json(); // why json() works and send() dont
+                res.send();
             }
         } catch (e) {
+            console.log(e);
             if (result !== null) {
                 res.statusCode = 400;
                 res.json((result as ReturnObj).message);
@@ -58,7 +59,7 @@ exports.createMatch = asyncHandler(
 
                 result = await matchService.addMatch(match, tx, token);
 
-                if (!result?.success) {
+                if (result && !result.success) {
                     throw new Error();
                 }
             });

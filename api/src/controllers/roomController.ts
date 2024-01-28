@@ -23,14 +23,14 @@ exports.commandRoom = asyncHandler(
                     tx
                 );
 
-                if (!result?.success) {
+                if (result && !result.success) {
                     throw new Error();
                 }
             });
 
             if (result !== null) {
                 res.statusCode = 200;
-                res.json();
+                res.send();
             }
         } catch (e) {
             if (result !== null) {
@@ -66,7 +66,7 @@ exports.createRoom = asyncHandler(
                     token
                 );
 
-                if (!roomResult?.success) {
+                if (roomResult && !roomResult.success) {
                     result = {
                         message: roomResult.message,
                         success: roomResult.success,
@@ -90,7 +90,7 @@ exports.createRoom = asyncHandler(
                     token
                 );
 
-                if (!matchResult?.success) {
+                if (matchResult && !matchResult.success) {
                     result = {
                         message: matchResult.message,
                         success: matchResult.success,
@@ -111,7 +111,7 @@ exports.createRoom = asyncHandler(
                     tx
                 );
 
-                if (!boardResult?.success) {
+                if (boardResult && !boardResult.success) {
                     result = {
                         message: boardResult.message,
                         success: boardResult.success,
@@ -161,7 +161,7 @@ exports.editRoom = asyncHandler(
                     tx
                 );
 
-                if (!result?.success) {
+                if (result && !result.success) {
                     throw new Error();
                 }
             });
@@ -248,7 +248,7 @@ exports.invite = asyncHandler(
 
                 result = await roomService.invite(req.params.roomId, tx, token);
 
-                if (!result?.success) {
+                if (result && !result.success) {
                     throw new Error();
                 }
             });

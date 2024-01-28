@@ -160,6 +160,7 @@ describe("roomController", () => {
         mockRequest = {};
         mockResponse = {
             json: jest.fn(),
+            send: jest.fn()
         };
     });
 

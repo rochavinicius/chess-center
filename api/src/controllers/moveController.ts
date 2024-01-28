@@ -15,7 +15,6 @@ exports.addMove = asyncHandler(
 
                 result = await moveService.addMove(newMove, tx);
 
-                // if (!result?.success) unit test is going to say that this line is uncovered because the result could be null
                 if (result && !result.success) {
                     throw new Error();
                 }
