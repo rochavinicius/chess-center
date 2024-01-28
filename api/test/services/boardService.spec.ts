@@ -31,11 +31,14 @@ describe("boardService", () => {
             matchId: "1",
             state: BOARD_INITIAL_STATE,
         };
+
+        const matchSpy = jest.spyOn(prismaMock.board, "create");
         prismaMock.match.findUnique.mockResolvedValue(null);
 
         let result = await boardService.addBoard(boardModel, prismaMock);
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).not.toHaveBeenCalled();
     });
 
     test("Should create new board", async () => {
@@ -58,6 +61,8 @@ describe("boardService", () => {
             matchId: "1",
             state: BOARD_INITIAL_STATE,
         };
+
+        const matchSpy = jest.spyOn(prismaMock.board, "create");
         prismaMock.match.findUnique.mockResolvedValue(defaultMatch);
         prismaMock.board.create.mockResolvedValue({
             id: "1",
@@ -69,6 +74,7 @@ describe("boardService", () => {
         let result = await boardService.addBoard(boardModel, prismaMock);
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 
     test("Should not update board that does not exist", async () => {
@@ -81,11 +87,14 @@ describe("boardService", () => {
             matchId: "1",
             state: BOARD_INITIAL_STATE,
         };
+
+        const matchSpy = jest.spyOn(prismaMock.board, "update");
         prismaMock.board.findUnique.mockResolvedValue(null);
 
         let result = await boardService.updateBoard(boardModel, prismaMock);
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).not.toHaveBeenCalled();
     });
 
     test("Should update board", async () => {
@@ -100,6 +109,8 @@ describe("boardService", () => {
             matchId: "1",
             state: BOARD_INITIAL_STATE,
         };
+
+        const matchSpy = jest.spyOn(prismaMock.board, "update");
         prismaMock.board.findUnique.mockResolvedValue({
             id: "1",
             match_id: "1",
@@ -116,6 +127,7 @@ describe("boardService", () => {
         let result = await boardService.updateBoard(boardModel, prismaMock);
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 
     test("Should get empty boards", async () => {
@@ -125,11 +137,13 @@ describe("boardService", () => {
             obj: []
         }
 
+        const matchSpy = jest.spyOn(prismaMock.board, "findMany");
         prismaMock.board.findMany.mockResolvedValue([]);
 
         let result = await boardService.getBoards();
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 
     test("Should get all boards", async () => {
@@ -164,6 +178,7 @@ describe("boardService", () => {
             ]
         }
 
+        const matchSpy = jest.spyOn(prismaMock.board, "findMany");
         prismaMock.board.findMany.mockResolvedValue([
             {
                 id: "1",
@@ -188,6 +203,7 @@ describe("boardService", () => {
         let result = await boardService.getBoards();
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 
     test("Should get board by id", async () => {
@@ -207,6 +223,7 @@ describe("boardService", () => {
             obj: expectedObj
         }
 
+        const matchSpy = jest.spyOn(prismaMock.board, "findUnique");
         prismaMock.board.findUnique.mockResolvedValue({
             id: "1",
             match_id: "2",
@@ -217,6 +234,7 @@ describe("boardService", () => {
         let result = await boardService.getBoardById("1");
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 
     test("Should not find board by id", async () => {
@@ -225,10 +243,12 @@ describe("boardService", () => {
             success: false,
         }
 
+        const matchSpy = jest.spyOn(prismaMock.board, "findUnique");
         prismaMock.board.findUnique.mockResolvedValue(null);
 
         let result = await boardService.getBoardById("1");
 
         expect(result).toStrictEqual(expectedRet);
+        expect(matchSpy).toHaveBeenCalled();
     });
 });

@@ -317,6 +317,10 @@ describe("matchService", () => {
         expect(createMatchSpy).toHaveBeenCalled();
     });
 
+    test("", async () => {
+        //TODO add command tests
+    });
+
     test("Should get empty matches", async () => {
         const expectedRet: ReturnObj = {
             message: "Matches found",
