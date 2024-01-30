@@ -145,7 +145,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            let matchForfeith = await tx.match.update({
+            await tx.match.update({
                 where: {
                     id: match.id,
                 },
@@ -156,11 +156,6 @@ const commandMatch = async (
                     end_timestamp: new Date(),
                 },
             });
-
-            if (!matchForfeith) {
-                returnObj.message = "Error trying to finish the match";
-                return returnObj;
-            }
 
             returnObj = {
                 message: "Success",
@@ -174,7 +169,7 @@ const commandMatch = async (
                 return returnObj;
             }
 
-            let matchRemake = await tx.match.update({
+            await tx.match.update({
                 where: {
                     id: match.id,
                 },
@@ -185,11 +180,6 @@ const commandMatch = async (
                     end_timestamp: null,
                 },
             });
-
-            if (!matchRemake) {
-                returnObj.message = "Error trying to remake the match";
-                return returnObj;
-            }
 
             let boardRemake = await tx.board.update({
                 where: {
@@ -236,7 +226,7 @@ const commandMatch = async (
                 token
             );
 
-            if (!matchRematchResult.success || !matchRematchResult.obj) {
+            if (!matchRematchResult.success) {
                 returnObj.message = "Error trying to create new match";
                 return returnObj;
             }
@@ -248,7 +238,7 @@ const commandMatch = async (
 
             let boardResult: ReturnObj = await boardService.addBoard(board, tx);
 
-            if (!boardResult.success || !boardResult.obj) {
+            if (!boardResult.success) {
                 returnObj.message = "Error trying to create new board";
                 return returnObj;
             }
