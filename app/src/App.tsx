@@ -1,18 +1,20 @@
 import * as React from "react";
+import "./App.css";
+import Header from "./components/Header";
+import SideMenu from "./components/SideMenu";
 
 class App extends React.Component {
-    state = {
-        name: "",
-    };
 
     componentDidMount() {
-        fetch("http://localhost:3000")
-            .then((res) => res.json())
-            .then((data) => this.setState({name: data.name}));
+        fetch("http://localhost:3000") //TODO read port from env
+            .then((res) => res.json());
     }
 
     render() {
-        return <h1>Hello dsdsdsd {this.state.name}!</h1>;
+        return <div className="max-height">
+            <Header/>
+            <SideMenu/>
+        </div>;
     }
 }
 

@@ -1,4 +1,5 @@
 import * as React from "react";
+import 'bootstrap/dist/css/bootstrap.css';
 import { useState, useEffect } from "react";
 
 import ReactDOM from "react-dom/client";
